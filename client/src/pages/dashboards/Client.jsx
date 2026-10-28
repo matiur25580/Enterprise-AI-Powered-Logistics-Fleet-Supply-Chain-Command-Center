@@ -2,10 +2,10 @@ import {useState,useEffect} from 'react';import axios from 'axios';import {useAu
 export default function Client(){
   const {logout}=useAuth();const {dark,toggle}=useTheme();
   const [f,setF]=useState({clientName:'',from:'',to:'',goods:'',weight:''});const [list,setList]=useState([]);const [msg,setMsg]=useState('');
-  const load=async()=>{const r=await axios.get('import.meta.env.VITE_API_URL || 'import.meta.env.VITE_API_URL || 'http://localhost:5000/api''/booking/all');setList(r.data);};
+  const load=async()=>{const r=await axios.get('import.meta.env.VITE_API_URL || 'API'/booking/all');setList(r.data);};
   useEffect(()=>{load();},[]);
-  const book=async(e)=>{e.preventDefault();const r=await axios.post('import.meta.env.VITE_API_URL || 'import.meta.env.VITE_API_URL || 'http://localhost:5000/api''/booking/create',f);setMsg(r.data.message);load();};
-  const dl=(id,inv)=>{window.open(`import.meta.env.VITE_API_URL || 'import.meta.env.VITE_API_URL || 'http://localhost:5000/api''/booking/invoice/${id}`,'_blank');};
+  const book=async(e)=>{e.preventDefault();const r=await axios.post('import.meta.env.VITE_API_URL || 'API'/booking/create',f);setMsg(r.data.message);load();};
+  const dl=(id,inv)=>{window.open(`import.meta.env.VITE_API_URL || 'API'/booking/invoice/${id}`,'_blank');};
   return <div style={{padding:20}}><button onClick={toggle}>{dark?'☀️':'🌙'}</button><button onClick={logout} style={{float:'right'}}>Logout</button>
   <h1>Client Dashboard</h1>{msg&&<p style={{color:'#22c55e'}}>{msg}</p>}
   <h3>New Booking</h3><form onSubmit={book} style={{display:'flex',gap:8,flexWrap:'wrap'}}>

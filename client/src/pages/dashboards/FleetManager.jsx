@@ -3,10 +3,10 @@ export default function FleetManager(){
   const {logout}=useAuth();const {dark,toggle}=useTheme();
   const [vehicles,setVehicles]=useState([]);const [f,setF]=useState({vehicleNumber:'',type:'Truck',capacity:''});
   const [trip,setTrip]=useState({from:'',to:'',vehicle:'',driver:''});const [msg,setMsg]=useState('');
-  const load=async()=>{const r=await axios.get('import.meta.env.VITE_API_URL || 'import.meta.env.VITE_API_URL || 'http://localhost:5000/api''/fleet/all');setVehicles(r.data);};
+  const load=async()=>{const r=await axios.get('import.meta.env.VITE_API_URL || 'API'/fleet/all');setVehicles(r.data);};
   useEffect(()=>{load();},[]);
-  const addVehicle=async(e)=>{e.preventDefault();const r=await axios.post('import.meta.env.VITE_API_URL || 'import.meta.env.VITE_API_URL || 'http://localhost:5000/api''/fleet/add',f);setMsg(r.data.message);load();};
-  const createTrip=async(e)=>{e.preventDefault();const r=await axios.post('import.meta.env.VITE_API_URL || 'import.meta.env.VITE_API_URL || 'http://localhost:5000/api''/trip/create',{...trip,status:'Scheduled'});setMsg(r.data.message);};
+  const addVehicle=async(e)=>{e.preventDefault();const r=await axios.post('import.meta.env.VITE_API_URL || 'API'/fleet/add',f);setMsg(r.data.message);load();};
+  const createTrip=async(e)=>{e.preventDefault();const r=await axios.post('import.meta.env.VITE_API_URL || 'API'/trip/create',{...trip,status:'Scheduled'});setMsg(r.data.message);};
   return <div style={{padding:20}}>
     <button onClick={toggle}>{dark?'☀️':'🌙'}</button><button onClick={logout} style={{float:'right'}}>Logout</button>
     <h1>FleetManager Dashboard</h1>
