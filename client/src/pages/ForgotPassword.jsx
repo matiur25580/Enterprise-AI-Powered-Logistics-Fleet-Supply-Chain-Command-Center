@@ -31,7 +31,7 @@ export default function ForgotPassword(){
       <form onSubmit={send}>
         <label style={label}>Account Role</label>
         <select value={role} onChange={e=>setRole(e.target.value)} style={input}>
-          <option>Admin</option><option>FleetManager</option><option>WarehouseManager</option><option>Driver</option><option>Client</option>
+          <option>Admin</option><option>FleetManager</option><option>WarehouseManager</option><option>Driver</option><option>Client</option><option>Accountant</option>
         </select>
         <label style={label}>Registered Email</label>
         <input autoComplete="email" type="email" placeholder="Enter your registered email" style={input} value={email} onChange={e=>setEmail(e.target.value)} required/>

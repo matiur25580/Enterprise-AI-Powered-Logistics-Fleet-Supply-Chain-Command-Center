@@ -30,7 +30,7 @@ export default function Login(){
       <form onSubmit={submit}>
         <label style={label}>Account Role</label>
         <select value={f.role} onChange={e=>setF({...f,role:e.target.value})} style={input}>
-          <option>Admin</option><option>FleetManager</option><option>WarehouseManager</option><option>Driver</option><option>Client</option>
+          <option>Admin</option><option>FleetManager</option><option>WarehouseManager</option><option>Driver</option><option>Client</option><option>Accountant</option>
         </select>
         <label style={label}>Email Address</label>
         <input type="email" placeholder="you@company.com" style={input} onChange={e=>setF({...f,email:e.target.value})} required/>
