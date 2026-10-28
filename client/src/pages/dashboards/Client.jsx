@@ -5,7 +5,7 @@ import {useTheme} from '../../context/ThemeContext';
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 export default function Client(){
   const {user,logout}=useAuth(); const {dark,toggle}=useTheme();
-  const [f,setF]=useState({clientName:'',from:'',to:'',goods:'',weight:''});
+  const [f,setF]=useState({clientName:'',email:'',from:'',to:'',goods:'',weight:''});
   const [list,setList]=useState([]); const [msg,setMsg]=useState('');
   const bg=dark?'#0a1128':'#eef2f9', card=dark?'#101d38':'#ffffff';
   const text=dark?'#eef3fb':'#0f1e38', sub=dark?'#93a7c9':'#5b6b87';
@@ -17,7 +17,7 @@ export default function Client(){
   const ok=(m)=>{setMsg(m);setTimeout(()=>setMsg(''),3500);};
   const book=async(e)=>{e.preventDefault();try{
     const r=await axios.post(API+'/booking/create',f);ok(r.data.message);
-    setF({clientName:'',from:'',to:'',goods:'',weight:''});load();
+    setF({clientName:'',email:'',from:'',to:'',goods:'',weight:''});load();
   }catch(e){ok(e.response?.data?.message||e.message);}};
   const badge=(s)=>{const c=s==='Delivered'?'#22c55e':s==='OnGoing'?'#f59e0b':s==='Cancelled'?'#dc2626':'#3b82f6';
     return <span style={{background:c+'22',color:c,padding:'4px 10px',borderRadius:20,fontSize:12,fontWeight:700}}>{s||'Pending'}</span>;};
@@ -40,6 +40,7 @@ export default function Client(){
     <div style={{background:card,border:bd,borderRadius:12,padding:16,marginBottom:14}}>
       <h3 style={{marginTop:0}}>New Booking</h3>
       <form onSubmit={book} style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))',gap:8}}>
+        <input type="email" placeholder="Email for notifications (optional)" value={f.email} onChange={e=>setF({...f,email:e.target.value})} style={inp}/>
         <input placeholder="Your Name" value={f.clientName} onChange={e=>setF({...f,clientName:e.target.value})} style={inp} required/>
         <input placeholder="From" value={f.from} onChange={e=>setF({...f,from:e.target.value})} style={inp} required/>
         <input placeholder="To" value={f.to} onChange={e=>setF({...f,to:e.target.value})} style={inp} required/>

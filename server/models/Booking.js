@@ -1,5 +1,6 @@
 const mongoose=require('mongoose');
 const b=new mongoose.Schema({
+  email:String,
   clientName:String, from:String, to:String, goods:String, weight:String,
   status:{type:String,default:'Pending'}, invoiceNo:{type:String,unique:true}
 },{timestamps:true});
