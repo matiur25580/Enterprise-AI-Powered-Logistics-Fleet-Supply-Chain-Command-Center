@@ -28,7 +28,7 @@ await fetch(API+'/audit/clear?role='+me.role,{method:'DELETE'});loadAudit();};
 const saveDoc=async(id)=>{const e=docEdit[id]||{};if(!Object.keys(e).length)return;
 await fetch(API+'/documents/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(e)});
 setDocEdit(s=>{const n={...s};delete n[id];return n;});loadDocs();};
-const addFuel=async()=>{if(!form.vehicle||!form.liters)return window.alert('Vehicle and liters required');
+const addFuel=async()=>{if(!form.vehicle||!form.liters)return ok('Vehicle and liters required');
 await fetch(API+'/maintenance/fuel',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...form,liters:Number(form.liters),cost:Number(form.cost)||0,odometer:Number(form.odometer)||0})});
 const v=form.vehicle;setForm({vehicle:'',liters:'',cost:'',odometer:'',note:''});loadFuelHist(v);};
 const loadFuelHist=async(vid)=>{if(!vid)return;try{const r=await fetch(API+'/maintenance/fuel/'+vid);const d=await r.json();setFuelHist(Array.isArray(d)?d:[]);}catch(e){}};
