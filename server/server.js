@@ -34,6 +34,7 @@ app.use('/api/audit', require('./routes/audit'));
 app.use('/api/notifications', require('./routes/notification'));
 app.use('/api/maintenance', require('./routes/maintenance'));
 app.use('/api/documents', require('./routes/documents'));
+app.use('/api/forecast', require('./routes/forecast'));
 app.get('/api/health',(req,res)=>res.json({status:'Logistics API running'}));
 io.on('connection',(socket)=>{
   socket.on('update-location',(data)=>{io.emit('fleet-location',data);});
