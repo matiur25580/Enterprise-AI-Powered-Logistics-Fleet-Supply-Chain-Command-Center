@@ -4,7 +4,7 @@
 
 A full-stack enterprise logistics platform connecting clients, fleet managers, warehouse managers, accountants and drivers in real time — with AI demand forecasting, audit trails and finance tooling.
 
-**Live:** Frontend (Vercel) · Backend (Render) · MongoDB Atlas
+**Live:** [Frontend (Vercel)](https://enterprise-ai-powered-logistics-fle-lac.vercel.app/) · [Backend (Render)](https://enterprise-ai-powered-logistics-fleet.onrender.com) · MongoDB Atlas
 
 ---
 
@@ -100,7 +100,6 @@ A full-stack enterprise logistics platform connecting clients, fleet managers, w
     ├── routes/                  # auth, fleet, warehouse, booking, trip,
     │                            # forecast, audit, notification, maintenance, documents
     ├── utils/                   # auditNotify, forecast, passwordPolicy, sendEmail
-    ├── middleware/              # (route guards)
     └── tests/                   # Jest unit tests (forecast, passwordPolicy)
 
 ---
