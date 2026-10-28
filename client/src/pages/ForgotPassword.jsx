@@ -26,14 +26,19 @@ export default function ForgotPassword(){
         <p style={{margin:0,fontSize:13,color:sub}}>Logistics • Fleet • Supply Chain</p>
       </div>
       <h2 style={{color:text,fontSize:18,margin:'0 0 6px',textAlign:'center'}}>Reset Password</h2>
-      <p style={{color:sub,fontSize:13,margin:'0 0 6px',textAlign:'center'}}>{step===1?'Enter your registered email':'Enter OTP and choose a new password'}</p>
-      {step===1?
+      <p style={{color:sub,fontSize:13,margin:'0 0 6px',textAlign:'center'}}>{step===1?
       <form onSubmit={send}>
         <label style={label}>Account Role</label>
         <select value={role} onChange={e=>setRole(e.target.value)} style={input}>
           <option>Admin</option><option>FleetManager</option><option>WarehouseManager</option><option>Driver</option><option>Client</option>
         </select>
         <label style={label}>Registered Email</label>
+        <input autoComplete="email" type="email" placeholder="Enter your registered email" style={input} value={email} onChange={e=>setEmail(e.target.value)} required/>
+        <button disabled={sending} style={{width:'100%',padding:14,marginTop:16,borderRadius:10,border:'none',background:'linear-gradient(90deg,#f59e0b,#fbbf24)',color:'#0a1128',fontWeight:800,fontSize:16,cursor:'pointer',boxSizing:'border-box'}}>{sending?'SENDING...':'SEND OTP'}</button>
+      </form>
+      :
+      <form onSubmit={reset}>
+        <label style={label}>6-Digit OTP</label>
         <div onPaste={e=>{e.preventDefault();const d=e.clipboardData.getData("text").replace(/\D/g,"").slice(0,6).split("");const n=["","","","","",""];d.forEach((c,i)=>{n[i]=c});setOtp(n);}} style={{display:"flex",gap:8,justifyContent:"center"}}>
           {[0,1,2,3,4,5].map(i=>(
             <input key={i} inputMode="numeric" maxLength={1} autoComplete="one-time-code" value={otp[i]||""}
@@ -43,7 +48,7 @@ export default function ForgotPassword(){
           ))}
         </div>
         <label style={label}>New Password</label>
-        <input autoComplete="new-password" type="password" placeholder="Choose a new password" style={input} onChange={e=>setNp(e.target.value)} required/>
+        <input autoComplete="new-password" type="password" placeholder="Choose a new password" style={input} value={np} onChange={e=>setNp(e.target.value)} required/>
         <button style={{width:'100%',padding:14,marginTop:16,borderRadius:10,border:'none',background:'linear-gradient(90deg,#16a34a,#22c55e)',color:'#fff',fontWeight:800,fontSize:16,cursor:'pointer',boxSizing:'border-box'}}>RESET PASSWORD</button>
       </form>}
       {msg&&<p style={{color:msg.includes('success')||msg.includes('sent')?'#22c55e':'#f87171',marginTop:14,textAlign:'center',fontSize:14}}>{msg}</p>}
