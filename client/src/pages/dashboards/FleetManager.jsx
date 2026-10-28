@@ -65,6 +65,7 @@ export default function FleetManager(){
       <button onClick={()=>setTab('vehicles')} style={tabBtn(tab==='vehicles')}>Vehicles</button>
       <button onClick={()=>setTab('trips')} style={tabBtn(tab==='trips')}>Trips</button>
       <button onClick={()=>setTab('bookings')} style={tabBtn(tab==='bookings')}>Bookings</button>
+      <button onClick={()=>setTab('drivers')} style={tabBtn(tab==='drivers')}>Drivers</button>
     </div>
     {tab==='vehicles'&&<div style={{background:card,border:bd,borderRadius:12,padding:16}}>
       <h3 style={{marginTop:0}}>Add Vehicle</h3>
@@ -104,6 +105,21 @@ export default function FleetManager(){
           </tr>))}
         </tbody></table></div>
       {bookings.length===0&&<p style={{color:sub,textAlign:'center'}}>No bookings yet.</p>}
+    </div>}
+    {tab==='drivers'&&<div style={{background:card,border:bd,borderRadius:12,padding:16}}>
+      <h3 style={{marginTop:0}}>Driver Roster ({drivers.length})</h3>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:12}}>
+        {drivers.map(d=>{
+          const veh=vehicles.find(v=>v.driver&&(v.driver._id===d._id||v.driver===d._id));
+          const act=trips.filter(x=>x.driver&&(x.driver._id===d._id||x.driver===d._id)&&(x.status==='Scheduled'||x.status==='OnGoing')).length;
+          return <div key={d._id} style={{border:bd,borderRadius:10,padding:14}}>
+            <div style={{fontWeight:700}}>{d.fullName}</div>
+            <div style={{fontSize:12,color:sub,marginBottom:8}}>{d.email}</div>
+            <div style={{fontSize:13}}>Vehicle: <b>{veh?veh.vehicleNumber:'Not assigned'}</b></div>
+            <div style={{fontSize:13}}>Active trips: <b style={{color:'#f59e0b'}}>{act}</b></div>
+          </div>;})}
+      </div>
+      {drivers.length===0&&<p style={{color:sub,textAlign:'center'}}>No drivers registered yet.</p>}
     </div>}
     {tab==='trips'&&<div style={{background:card,border:bd,borderRadius:12,padding:16}}>
       <h3 style={{marginTop:0}}>Create Trip</h3>

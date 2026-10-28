@@ -17,6 +17,7 @@ export default function Admin(){
   const [drivers,setDrivers]=useState([]); const [managers,setManagers]=useState([]);
   const [live,setLive]=useState([]); const [msg,setMsg]=useState('');
   const [q,setQ]=useState({v:'',t:'',w:'',b:''});
+  const [users,setUsers]=useState({});
   const [vf,setVf]=useState({vehicleNumber:'',type:'Truck',capacity:'',driver:''});
   const [tf,setTf]=useState({vehicle:'',driver:'',from:'',to:'',startDate:''});
   const [wf,setWf]=useState({name:'',location:'',totalCapacity:'',manager:''});
@@ -33,6 +34,7 @@ export default function Admin(){
     setVehicles(await g('/fleet/all')); setTrips(await g('/trip/all'));
     setWarehouses(await g('/warehouse/all')); setBookings(await g('/booking/all'));
     setDrivers(await g('/auth/by-role/Driver')); setManagers(await g('/auth/by-role/WarehouseManager'));
+    const u={};for(const r of ['Admin','FleetManager','WarehouseManager','Driver','Client']){u[r]=await g('/auth/by-role/'+r);}setUsers(u);
   };
   useEffect(()=>{load();socket.on('fleet-location',(d)=>{setLive(p=>[...p.slice(-9),d]);});},[]);
   const ok=(m)=>{setMsg(m);setTimeout(()=>setMsg(''),3500);};
@@ -63,7 +65,13 @@ export default function Admin(){
   const fT=trips.filter(x=>(((x.vehicle&&x.vehicle.vehicleNumber)||'')+' '+(x.from||'')+' '+(x.to||'')+' '+((x.driver&&x.driver.fullName)||'')).toLowerCase().includes(q.t.toLowerCase()));
   const fW=warehouses.filter(x=>((x.name||'')+' '+(x.location||'')).toLowerCase().includes(q.w.toLowerCase()));
   const fB=bookings.filter(x=>((x.invoiceNo||'')+' '+(x.clientName||'')+' '+(x.from||'')+' '+(x.to||'')).toLowerCase().includes(q.b.toLowerCase()));
-  const tabs=[['vehicles','Vehicles'],['trips','Trips'],['warehouses','Warehouses'],['bookings','Bookings'],['live','Live Tracking'],['reports','Reports']];
+  const tabs=[['vehicles','Vehicles'],['trips','Trips'],['warehouses','Warehouses'],['bookings','Bookings'],['live','Live Tracking'],['reports','Reports'],['users','Users']];
+  const exportCSV=()=>{
+    const rows=[['Invoice','Client','Email','From','To','Goods','Weight','Status','Date']];
+    bookings.forEach(b=>rows.push([b.invoiceNo,b.clientName,b.email,b.from,b.to,b.goods,b.weight,b.status||'Pending',b.createdAt?new Date(b.createdAt).toLocaleDateString():''].map(x=>'"'+String(x==null?'':x).replace(/"/g,'""')+'"')));
+    const blob=new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv'});
+    const el=document.createElement('a');el.href=URL.createObjectURL(blob);el.download='fleetcommand_bookings.csv';el.click();ok('Bookings exported as CSV');
+  };
   const insights=[];
   const totV=vehicles.length;
   const util=totV?Math.round(vehicles.filter(v=>v.status==='OnTrip'||v.status==='Active').length/totV*100):0;
@@ -198,7 +206,10 @@ export default function Admin(){
       {fW.length===0&&<p style={{color:sub,textAlign:'center'}}>No warehouses yet.</p>}
     </div>}
     {tab==='bookings'&&<div style={{background:card,border:bd,borderRadius:12,padding:16}}>
-      <h3 style={{marginTop:0}}>All Bookings ({bookings.length})</h3>
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10,flexWrap:'wrap',gap:8}}>
+        <h3 style={{margin:0}}>All Bookings ({bookings.length})</h3>
+        <button onClick={exportCSV} style={{...btn,padding:'8px 16px',fontSize:13}}>Export CSV</button>
+      </div>
       <input placeholder="Search..." value={q.b} onChange={e=>setQ({...q,b:e.target.value})} style={{...inp,maxWidth:280,marginBottom:10}}/>
       <div style={{overflowX:'auto'}}><table style={{width:'100%',borderCollapse:'collapse'}}>
         <thead><tr><th style={th}>Client</th><th style={th}>Route</th><th style={th}>Goods</th><th style={th}>Weight</th><th style={th}>Status</th><th style={th}>Date</th><th style={th}>Action</th></tr></thead>
@@ -243,6 +254,21 @@ export default function Admin(){
           {Object.keys(vByStatus).length===0&&<p style={{color:sub,fontSize:13}}>No vehicles yet.</p>}
           {Object.entries(vByStatus).map(([k,v])=>barRow(k,v,totV2,'linear-gradient(90deg,#a855f7,#7c3aed)'))}
         </div>
+      </div>
+    </div>}
+    {tab==='users'&&<div style={{background:card,border:bd,borderRadius:12,padding:16}}>
+      <h3 style={{marginTop:0}}>User Directory</h3>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:14}}>
+        {['Admin','FleetManager','WarehouseManager','Driver','Client'].map(r=>(
+          <div key={r} style={{border:bd,borderRadius:10,padding:14}}>
+            <div style={{fontWeight:800,marginBottom:6}}>{r} <span style={{color:'#f59e0b'}}>({(users[r]||[]).length})</span></div>
+            {(users[r]||[]).map(x=>(
+              <div key={x._id} style={{fontSize:13,padding:'6px 0',borderBottom:bd}}>
+                <div style={{fontWeight:600}}>{x.fullName}</div>
+                <div style={{color:sub,fontSize:12}}>{x.email}</div>
+              </div>))}
+            {(users[r]||[]).length===0&&<p style={{color:sub,fontSize:12}}>No users yet.</p>}
+          </div>))}
       </div>
     </div>}
     {tab==='live'&&<div style={{background:card,border:bd,borderRadius:12,padding:16}}>

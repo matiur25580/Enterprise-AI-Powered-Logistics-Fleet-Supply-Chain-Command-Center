@@ -7,6 +7,7 @@ export default function Client(){
   const {user,logout}=useAuth(); const {dark,toggle}=useTheme();
   const [f,setF]=useState({clientName:'',email:'',from:'',to:'',goods:'',weight:''});
   const [list,setList]=useState([]); const [msg,setMsg]=useState('');
+  const [sq,setSq]=useState('');
   const bg=dark?'#0a1128':'#eef2f9', card=dark?'#101d38':'#ffffff';
   const text=dark?'#eef3fb':'#0f1e38', sub=dark?'#93a7c9':'#5b6b87';
   const bd=dark?'1px solid #27406e':'1px solid #dbe4f0';
@@ -21,6 +22,7 @@ export default function Client(){
   }catch(e){ok(e.response?.data?.message||e.message);}};
   const badge=(s)=>{const c=s==='Delivered'?'#22c55e':s==='OnGoing'?'#f59e0b':s==='Cancelled'?'#dc2626':'#3b82f6';
     return <span style={{background:c+'22',color:c,padding:'4px 10px',borderRadius:20,fontSize:12,fontWeight:700}}>{s||'Pending'}</span>;};
+  const fL=list.filter(b=>((b.invoiceNo||'')+' '+(b.from||'')+' '+(b.to||'')+' '+(b.clientName||'')).toLowerCase().includes(sq.toLowerCase()));
   const my=list.filter(b=>!user||!user.fullName||(b.clientName||'').toLowerCase()===(user.fullName||'').toLowerCase());
   return (
   <div style={{minHeight:'100vh',background:bg,color:text,padding:16,fontFamily:'Segoe UI,system-ui,sans-serif'}}>
@@ -50,8 +52,11 @@ export default function Client(){
       </form>
     </div>
     <div style={{background:card,border:bd,borderRadius:12,padding:16}}>
-      <h3 style={{marginTop:0}}>Bookings ({list.length})</h3>
-      {list.map(b=>(
+      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10,flexWrap:'wrap',gap:8}}>
+        <h3 style={{margin:0}}>Bookings ({fL.length}/{list.length})</h3>
+        <input placeholder="Search invoice / route..." value={sq} onChange={e=>setSq(e.target.value)} style={{...inp,margin:0,maxWidth:240}}/>
+      </div>
+      {fL.map(b=>(
         <div key={b._id} style={{border:bd,borderRadius:10,padding:12,marginBottom:10,display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:8}}>
           <div>
             <div style={{fontWeight:700,fontSize:15}}>{b.invoiceNo} - {b.from} to {b.to}</div>
@@ -62,7 +67,7 @@ export default function Client(){
             <button onClick={()=>window.open(API+'/booking/invoice/'+b._id,'_blank')} style={{...btn,padding:'6px 12px',fontSize:12}}>Invoice PDF</button>
           </div>
         </div>))}
-      {list.length===0&&<p style={{color:sub,textAlign:'center'}}>No bookings yet. Create your first shipment above.</p>}
+      {fL.length===0&&<p style={{color:sub,textAlign:'center'}}>No bookings yet. Create your first shipment above.</p>}
     </div>
   </div>);
 }

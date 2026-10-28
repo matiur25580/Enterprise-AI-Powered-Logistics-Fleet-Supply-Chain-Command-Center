@@ -35,6 +35,7 @@ export default function WarehouseManager(){
   const totCap=list.reduce((s,w)=>s+(Number(w.totalCapacity)||0),0);
   const totUsed=list.reduce((s,w)=>s+(Number(w.usedCapacity)||0),0);
   const util=totCap?Math.round(totUsed/totCap*100):0;
+  const critical=list.filter(w=>w.totalCapacity&&((w.usedCapacity||0)/w.totalCapacity)>=0.9);
   const bar=(w)=>{const pct=w.totalCapacity?Math.min(100,Math.round((w.usedCapacity||0)/w.totalCapacity*100)):0;
     const c=pct>85?'#dc2626':pct>60?'#f59e0b':'#22c55e';
     return <div style={{marginTop:6}}><div style={{height:8,background:dark?'#0b152b':'#e5eaf2',borderRadius:4,minWidth:90}}>
@@ -56,6 +57,9 @@ export default function WarehouseManager(){
         </div>))}
     </div>
     <div style={{background:card,border:bd,borderRadius:12,padding:16}}>
+      {critical.length>0&&<div style={{background:'#dc262622',border:'1px solid #dc2626',borderRadius:10,padding:12,marginBottom:14,fontSize:14}}>
+        <b style={{color:'#dc2626'}}>Capacity alert:</b> {critical.map(w=>w.name).join(', ')} {critical.length>1?'are':'is'} 90%+ full. Consider redistributing stock.
+      </div>}
       <h3 style={{marginTop:0}}>Add Warehouse</h3>
       <form onSubmit={add} style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))',gap:8,marginBottom:14}}>
         <input placeholder="Warehouse Name" value={f.name} onChange={e=>setF({...f,name:e.target.value})} style={inp} required/>

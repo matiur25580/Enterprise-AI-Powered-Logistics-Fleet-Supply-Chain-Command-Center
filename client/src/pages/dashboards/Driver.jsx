@@ -61,7 +61,7 @@ export default function Driver(){
     </div>
     {msg&&<div style={{background:card,border:bd,borderRadius:8,padding:10,marginBottom:12,textAlign:'center',fontSize:14}}>{msg}</div>}
     <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(130px,1fr))',gap:10,marginBottom:14}}>
-      {[['Assigned Trips',trips.length],['Active',active],['Delivered',done],['My Vehicle',myVehicle?myVehicle.vehicleNumber:'-']].map(s=>(
+      {[['Assigned Trips',trips.length],['Active',active],['Delivered',done],['Completion',trips.length?Math.round(done/trips.length*100)+'%':'-'],['My Vehicle',myVehicle?myVehicle.vehicleNumber:'-']].map(s=>(
         <div key={s[0]} style={{background:card,border:bd,borderRadius:12,padding:14,textAlign:'center'}}>
           <div style={{fontSize:13,color:sub}}>{s[0]}</div>
           <div style={{fontSize:24,fontWeight:800,color:'#f59e0b'}}>{s[1]}</div>
