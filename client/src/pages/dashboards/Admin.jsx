@@ -166,7 +166,7 @@ export default function Admin(){
             <td style={td}>{b.name||b.clientName||b.fullName||'-'}</td>
             <td style={td}>{b.from} to {b.to}</td>
             <td style={td}>{b.goods||'-'}</td><td style={td}>{b.weight||'-'}</td>
-            <td style={td}>{b.status||'Pending'}</td>
+            <td style={td}><select value={b.status||'Pending'} onChange={async(e)=>{try{const r=await axios.put(API+'/booking/status/'+b._id,{status:e.target.value});ok(r.data.message);load();}catch(er){ok(er.message);}}} style={{...inp,margin:0,width:'auto'}}>{['Pending','Confirmed','OnGoing','Delivered','Cancelled'].map(s=><option key={s} value={s}>{s}</option>)}</select></td>
             <td style={td}>{b.createdAt?new Date(b.createdAt).toLocaleDateString():'-'}</td>
           </tr>))}
         </tbody></table></div>

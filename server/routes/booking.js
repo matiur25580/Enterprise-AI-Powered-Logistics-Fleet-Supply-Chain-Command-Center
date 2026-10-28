@@ -10,4 +10,5 @@ r.get('/invoice/:id',async(req,res)=>{
   const doc=new PDFDocument();res.setHeader('Content-Type','application/pdf');res.setHeader('Content-Disposition',`attachment; filename=${b.invoiceNo}.pdf`);
   doc.pipe(res);doc.fontSize(20).text('Logistics Invoice',100,100);doc.fontSize(12).text(`Invoice No: ${b.invoiceNo}`,100,140);doc.text(`Client: ${b.clientName}`,100,160);doc.text(`From: ${b.from} To: ${b.to}`,100,180);doc.text(`Goods: ${b.goods} Weight: ${b.weight}`,100,200);doc.text(`Status: ${b.status}`,100,220);doc.text(`Date: ${new Date().toLocaleDateString('en-GB')}`,100,240);doc.end();
 });
+r.put('/status/:id',async(req,res)=>{try{await Booking.findByIdAndUpdate(req.params.id,{status:req.body.status});res.json({message:'Booking status updated successfully',success:true});}catch(e){res.status(500).json({message:e.message});}});
 module.exports=r;
