@@ -17,6 +17,8 @@ r.put('/status/:id',async(req,res)=>{try{
     const b=await Booking.findByIdAndUpdate(req.params.id,{status:req.body.status},{new:true});
     if(b&&req.body.status==='Delivered'&&b.email){sendMail(b.email,'Shipment Delivered - '+b.invoiceNo,
       '<h2>FleetCommand</h2><p>Hi '+(b.clientName||'Customer')+',</p><p>Your shipment <b>'+b.invoiceNo+'</b> ('+b.from+' to '+b.to+') has been <b>delivered</b>.</p><p>Thank you for choosing FleetCommand.</p>').catch(function(){});}
+    if(b&&req.body.status==='Approved'&&b.email){sendMail(b.email,'Booking Approved - '+b.invoiceNo,'<h2>FleetCommand</h2><p>Hi '+(b.clientName||'Customer')+',</p><p>Your booking <b>'+b.invoiceNo+'</b> ('+b.from+' to '+b.to+') has been <b>approved</b>. We will schedule your shipment soon.</p>').catch(function(){});}
+    if(b&&req.body.status==='Rejected'&&b.email){sendMail(b.email,'Booking Update - '+b.invoiceNo,'<h2>FleetCommand</h2><p>Hi '+(b.clientName||'Customer')+',</p><p>Your booking <b>'+b.invoiceNo+'</b> ('+b.from+' to '+b.to+') could not be accepted at this time. Please contact support.</p>').catch(function(){});}
     res.json({message:'Booking status updated successfully',success:true});}catch(e){res.status(500).json({message:e.message});}});
 
 r.put('/billing/:id',async(req,res)=>{try{const u={};if(req.body.amount!==undefined&&req.body.amount!=='')u.amount=Number(req.body.amount);if(req.body.paymentStatus)u.paymentStatus=req.body.paymentStatus;const b=await Booking.findByIdAndUpdate(req.params.id,u,{new:true});res.json({message:'Billing updated',success:true,booking:b})}catch(e){res.status(500).json({message:e.message})}});

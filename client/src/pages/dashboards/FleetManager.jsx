@@ -11,7 +11,7 @@ export default function FleetManager(){
   const [tab,setTab]=useState('vehicles');
   const [vehicles,setVehicles]=useState([]); const [trips,setTrips]=useState([]);
   const [drivers,setDrivers]=useState([]);
-  const [bookings,setBookings]=useState([]); const [msg,setMsg]=useState('');
+  const [bookings,setBookings]=useState([]);const updBk=async(id,st)=>{try{await axios.put(API+'/booking/status/'+id,{status:st});setBookings(bookings.map(x=>x._id===id?{...x,status:st}:x));}catch(e){alert(e.response?.data?.message||e.message);}}; const [msg,setMsg]=useState('');
   const [vf,setVf]=useState({vehicleNumber:'',type:'Truck',capacity:'',driver:''});
   const [tf,setTf]=useState({vehicle:'',driver:'',from:'',to:'',startDate:''});
   const bg=dark?'#0a1128':'#eef2f9', card=dark?'#101d38':'#ffffff';
@@ -99,9 +99,11 @@ export default function FleetManager(){
             <td style={td}><b>{b.invoiceNo}</b></td><td style={td}>{b.clientName||'-'}</td>
             <td style={td}>{b.from} to {b.to}</td><td style={td}>{b.goods||'-'}</td>
             <td style={td}>{b.status||'Pending'}</td>
-            <td style={td}>{(b.status||'Pending')==='Pending'||(b.status||'Pending')==='Confirmed'
-              ?<button onClick={()=>{setTf({vehicle:'',driver:'',bookingId:b._id,from:b.from||'',to:b.to||'',startDate:''});setTab('trips');window.scrollTo(0,0);}} style={{...btn,padding:'6px 12px',fontSize:12}}>Create Trip</button>
-              :<span style={{color:sub,fontSize:12}}>Converted</span>}</td>
+            <td style={td}>{(()=>{const st=b.status||'Pending';
+if(st==='Pending')return <span style={{display:'flex',gap:6,flexWrap:'wrap'}}><button onClick={()=>updBk(b._id,'Approved')} style={{...btn,padding:'6px 12px',fontSize:12,background:'#16a34a'}}>Approve</button><button onClick={()=>updBk(b._id,'Rejected')} style={{...btn,padding:'6px 12px',fontSize:12,background:'#dc2626'}}>Reject</button></span>;
+if(st==='Approved'||st==='Confirmed')return <button onClick={()=>{setTf({vehicle:'',driver:'',bookingId:b._id,from:b.from||'',to:b.to||'',startDate:''});setTab('trips');window.scrollTo(0,0);}} style={{...btn,padding:'6px 12px',fontSize:12}}>Create Trip</button>;
+if(st==='Rejected')return <span style={{color:'#dc2626',fontSize:12,fontWeight:700}}>Rejected</span>;
+return <span style={{color:sub,fontSize:12}}>{st}</span>;})()}</td>
           </tr>))}
         </tbody></table></div>
       {bookings.length===0&&<p style={{color:sub,textAlign:'center'}}>No bookings yet.</p>}
