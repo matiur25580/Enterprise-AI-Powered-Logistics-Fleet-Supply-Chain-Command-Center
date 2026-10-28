@@ -1,6 +1,7 @@
 import {useState,useRef,useEffect} from 'react';
 import axios from 'axios';
 import {useTheme} from '../context/ThemeContext';
+import {useNavigate} from 'react-router-dom';
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 export default function Register(){
   const nav=useNavigate();
