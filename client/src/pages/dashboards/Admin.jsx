@@ -157,7 +157,7 @@ export default function Admin(){
       </form>
       <input placeholder="Search..." value={q.t} onChange={e=>setQ({...q,t:e.target.value})} style={{...inp,maxWidth:280,marginBottom:10}}/>
       <div style={{overflowX:'auto'}}><table style={{width:'100%',borderCollapse:'collapse'}}>
-        <thead><tr><th style={th}>Vehicle</th><th style={th}>Driver</th><th style={th}>Route</th><th style={th}>Status</th><th style={th}>Start Date</th></tr></thead>
+        <thead><tr><th style={th}>Vehicle</th><th style={th}>Driver</th><th style={th}>Route</th><th style={th}>Status</th><th style={th}>Start Date</th><th style={th}>Action</th></tr></thead>
         <tbody>{fT.map(t=>(
           <tr key={t._id}>
             <td style={td}><b>{(t.vehicle&&t.vehicle.vehicleNumber)||'-'}</b></td>
@@ -165,6 +165,7 @@ export default function Admin(){
             <td style={td}>{t.from} to {t.to}</td>
             <td style={td}><select value={t.status} onChange={e=>tStatus(t._id,e.target.value)} style={{...inp,margin:0,width:'auto'}}>{T_STATUS.map(s=><option key={s} value={s}>{s}</option>)}</select></td>
             <td style={td}>{t.startDate?new Date(t.startDate).toLocaleDateString():'-'}</td>
+            <td style={td}><button onClick={async()=>{if(!window.confirm('Delete this trip?'))return;try{const r=await 【entity-axios¦canonical_name=Axios】.delete(API+'/trip/'+t._id);ok(r.data.message);load();}catch(e){ok(e.message);}}} style={{...btn,background:'#dc2626',color:'#fff',padding:'6px 12px',fontSize:12}}>Delete</button></td>
           </tr>))}
         </tbody></table></div>
       {fT.length===0&&<p style={{color:sub,textAlign:'center'}}>No trips yet.</p>}
