@@ -9,7 +9,18 @@ const {isStrongPassword} = require('./utils/passwordPolicy');
 const http=require('http');const {Server}=require('socket.io');
 const app=express();const server=http.createServer(app);
 const io=new Server(server,{cors:{origin:"*"}});
-app.use(cors());app.use(express.json());
+app.use(cors());app.use(express.json())
+
+// Sanitize: empty-string ObjectId fields -> null (prevents Cast to ObjectId errors)
+app.use((req,res,next)=>{
+  if(req.body && typeof req.body==='object'){
+    for(const k of ['driver','vehicle','bookingId','warehouse']){
+      if(req.body[k]==='') req.body[k]=null;
+    }
+  }
+  next();
+});
+;
 app.use(helmet({contentSecurityPolicy:false}));
 app.set('trust proxy', 1);
 const authLimiter = rateLimit({windowMs:15*60*1000, max:60, message:{msg:'Too many attempts. Try again in 15 minutes.'}});
