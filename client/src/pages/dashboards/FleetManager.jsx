@@ -11,7 +11,7 @@ export default function FleetManager(){
   const [tab,setTab]=useState('vehicles');
   const [vehicles,setVehicles]=useState([]); const [trips,setTrips]=useState([]);
   const [drivers,setDrivers]=useState([]);
-  const [bookings,setBookings]=useState([]);const updBk=async(id,st)=>{try{await axios.put(API+'/booking/status/'+id,{status:st});setBookings(bookings.map(x=>x._id===id?{...x,status:st}:x));}catch(e){alert(e.response?.data?.message||e.message);}}; const [msg,setMsg]=useState('');
+  const [bookings,setBookings]=useState([]);const updBk=async(id,st)=>{try{await axios.put(API+'/booking/status/'+id,{status:st});setBookings(bookings.map(x=>x._id===id?{...x,status:st}:x));;ok(st==='Approved'?'Booking approved successfully':'Booking rejected');}catch(e){ok(e.response?.data?.message||e.message);}}; const [msg,setMsg]=useState('');
   const [vf,setVf]=useState({vehicleNumber:'',type:'Truck',capacity:'',driver:''});
   const [tf,setTf]=useState({vehicle:'',driver:'',from:'',to:'',startDate:''});
   const bg=dark?'#0a1128':'#eef2f9', card=dark?'#101d38':'#ffffff';
