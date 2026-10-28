@@ -14,7 +14,7 @@ A full-stack enterprise logistics platform connecting clients, fleet managers, w
 - 7-day booking demand prediction using **exponential smoothing + linear trend**
 - `GET /api/forecast/demand` — past daily counts + next 7-day forecast as JSON
 - Forecast core is a pure function (`server/utils/forecast.js`) covered by Jest unit tests
-- Admin Reports tab shows a violet **"NEXT 7 DAYS"** chart with trend indicator (📈 rising / 📉 falling / ➡️ stable)
+- Admin Reports tab shows a violet **"NEXT 7 DAYS"** chart with trend indicator (rising / falling / stable)
 
 ### 🏠 Landing Page
 - Hero with live platform stats, feature grid, role showcase, how-it-works
@@ -55,7 +55,7 @@ A full-stack enterprise logistics platform connecting clients, fleet managers, w
 
 ### 🏢 System Center (Enterprise Module)
 - **Audit log** — every create/update/delete auto-logged (who, what, when) + PDF export
-- **Notification center** — in-app 🔔 bell with 30-second refresh
+- **Notification center** — in-app bell with 30-second refresh
 - **Document expiry alerts** — insurance / fitness / permit / pollution
 - **Fuel log** per vehicle
 - **Maintenance scheduling**
@@ -73,7 +73,7 @@ A full-stack enterprise logistics platform connecting clients, fleet managers, w
 
 | Layer | Technology |
 |---|---|
-| Frontend | React + Vite, react-router-dom, 【entity-axios¦canonical_name=axios】, socket.io-client, jsPDF |
+| Frontend | React + Vite, react-router-dom, axios, socket.io-client, jsPDF |
 | Backend | Node.js, Express, Mongoose, socket.io, Helmet, express-rate-limit |
 | Database | MongoDB Atlas |
 | Email | Mailjet (booking + delivery notifications) |
@@ -85,22 +85,22 @@ A full-stack enterprise logistics platform connecting clients, fleet managers, w
 
 ## 📁 Project Structure
 
-├── client/                      # React + Vite frontend
-│   └── src/
-│       ├── components/          # NotifBell, ForecastChart, Skeleton, EmptyState...
-│       ├── context/             # AuthContext, ThemeContext
-│       ├── pages/
-│       │   ├── dashboards/      # Admin, FleetManager, WarehouseManager,
-│       │   │                    # Driver, Client, Accountant
-│       │   └── SystemCenter.jsx # Audit log, notifications, documents, fuel, maintenance
-│       └── utils/               # api (axios), pdf export
-└── server/
-    ├── models/                  # User, Vehicle, Trip, Warehouse, Booking,
-    │                            # AuditLog, FuelLog, Notification...
-    ├── routes/                  # auth, fleet, warehouse, booking, trip,
-    │                            # forecast, audit, notification, maintenance, documents
-    ├── utils/                   # auditNotify, forecast, passwordPolicy, sendEmail
-    └── tests/                   # Jest unit tests (forecast, passwordPolicy)
+    client/                      # React + Vite frontend
+      src/
+        components/              # NotifBell, ForecastChart, Skeleton, EmptyState...
+        context/                 # AuthContext, ThemeContext
+        pages/
+          dashboards/            # Admin, FleetManager, WarehouseManager,
+                                 # Driver, Client, Accountant
+          SystemCenter.jsx        # Audit log, notifications, documents, fuel, maintenance
+        utils/                   # api (axios), pdf export
+    server/
+      models/                    # User, Vehicle, Trip, Warehouse, Booking,
+                                 # AuditLog, FuelLog, Notification...
+      routes/                    # auth, fleet, warehouse, booking, trip,
+                                 # forecast, audit, notification, maintenance, documents
+      utils/                     # auditNotify, forecast, passwordPolicy, sendEmail
+      tests/                     # Jest unit tests (forecast, passwordPolicy)
 
 ---
 
@@ -125,23 +125,35 @@ A full-stack enterprise logistics platform connecting clients, fleet managers, w
 
 ## 🧪 Testing
 
-```bash
-cd server
-npm test        # 11 Jest tests — forecast math + password policy
+    cd server
+    npm test        # 11 Jest tests — forecast math + password policy
+
 Every push also runs the full CI pipeline (.github/workflows/ci.yml): backend Jest suite + frontend production build.
-🚀 Run Locally
-Backend
-cd server
-npm install
-cp .env.example .env   # fill MONGO_URI, JWT_SECRET, EMAIL_* / Mailjet keys, CLIENT_URL
-npm start              # or: node server.js
-Frontend
-cd client
-npm install
-# set VITE_API_URL to your backend URL in .env (defaults to http://localhost:5000/api)
-npm run dev
-Environment variables (backend): MONGO_URI, JWT_SECRET, PORT, CLIENT_URL, Mailjet API keys, sender email — see .env.example. Never commit real secrets.
-🌐 Deployment • Frontend → Vercel: auto-deploys on push to main (npm run build) • Backend → Render: auto-deploys on push to main (node server.js) • Set VITE_API_URL (frontend) to the Render backend URL, and CLIENT_URL (backend) to the Vercel URL. 
-👤 Author
-Rubel Ali — MERN Full-Stack Developer
-GitHub: @matiur25580
+
+## 🚀 Run Locally
+
+### Backend
+
+    cd server
+    npm install
+    cp .env.example .env   # fill MONGO_URI, JWT_SECRET, Mailjet keys, CLIENT_URL
+    npm start              # or: node server.js
+
+### Frontend
+
+    cd client
+    npm install
+    # set VITE_API_URL in .env (defaults to http://localhost:5000/api)
+    npm run dev
+
+**Environment variables (backend):** MONGO_URI, JWT_SECRET, PORT, CLIENT_URL, Mailjet API keys, sender email — see .env.example. Never commit real secrets.
+
+## 🌐 Deployment
+- **Frontend → Vercel:** auto-deploys on push to main (`npm run build`)
+- **Backend → Render:** auto-deploys on push to main (`node server.js`)
+- Set VITE_API_URL (frontend) to the Render backend URL, and CLIENT_URL (backend) to the Vercel URL.
+
+## 👤 Author
+
+**Rubel Ali** — MERN Full-Stack Developer
+GitHub: [@matiur25580](https://github.com/matiur25580)
