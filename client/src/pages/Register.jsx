@@ -23,7 +23,7 @@ export default function Register(){
     if(!f.email){setMsg('Please enter email first');return;}
     if(f.password!==cpw){setMsg('Password and Confirm Password do not match');return;}
     setSending(true);setMsg('Sending OTP, please wait...');
-    try{await axios.post(API+"/auth/send-otp",{email:f.email},{timeout:45000});setStep(2);setTimer(300);setMsg('OTP sent to your email');}
+    try{await axios.post(API+"/auth/send-otp",{email:f.email,role:f.role},{timeout:45000});setStep(2);setTimer(300);setMsg('OTP sent to your email');}
     catch(e){setMsg('Error: '+(e.response?.data?.message||e.message||'OTP send failed'));}
     setSending(false);
   };

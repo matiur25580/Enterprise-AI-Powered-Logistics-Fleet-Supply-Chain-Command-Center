@@ -1,10 +1,13 @@
 import {useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import {useTheme} from '../context/ThemeContext';
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 export default function ForgotPassword(){
+  const nav=useNavigate();
   const {dark,toggle}=useTheme();
-  const [email,setEmail]=useState('');const [otp,setOtp]=useState('');const [np,setNp]=useState('');
+  const [email,setEmail]=useState('');const [otp,setOtp]=useState(['','','','','','']);
+  const [role,setRole]=useState('Client');const [np,setNp]=useState('');
   const [step,setStep]=useState(1);const [msg,setMsg]=useState('');const [sending,setSending]=useState(false);
   const bg=dark?'linear-gradient(135deg,#0a1128,#14264d,#1e3a6e)':'linear-gradient(135deg,#dbe7f8,#c3d6f0)';
   const cardBg=dark?'#101d38':'#ffffff', cardBd=dark?'1px solid #27406e':'1px solid #dbe4f0';
@@ -12,8 +15,8 @@ export default function ForgotPassword(){
   const fBg=dark?'#0b152b':'#f4f7fc', fBd=dark?'#2b4570':'#c9d6e8', fTx=dark?'#f1f5f9':'#10203c';
   const input={width:'100%',padding:'13px 14px',margin:'0 0 4px 0',borderRadius:10,border:'1px solid '+fBd,background:fBg,color:fTx,fontSize:15,boxSizing:'border-box',outline:'none'};
   const label={display:'block',fontSize:13,fontWeight:600,color:sub,margin:'12px 0 6px 2px',textAlign:'left'};
-  const send=async(e)=>{e.preventDefault();setSending(true);setMsg('Sending OTP, please wait...');try{await axios.post(API+"/auth/forgot-password",{email},{timeout:45000});setStep(2);setMsg('OTP sent to your email');}catch(e){setMsg(e.response?.data?.message||'Failed to send OTP');}setSending(false);};
-  const reset=async(e)=>{e.preventDefault();try{const r=await axios.post(API+"/auth/reset-password",{email,otp,newPassword:np});setMsg(r.data.message);}catch(e){setMsg(e.response?.data?.message||'Reset failed');}};
+  const send=async(e)=>{e.preventDefault();setSending(true);setMsg('Sending OTP, please wait...');try{await axios.post(API+"/auth/forgot-password",{email,role},{timeout:45000});setStep(2);setMsg('OTP sent to your email');}catch(e){setMsg(e.response?.data?.message||'Failed to send OTP');}setSending(false);};
+  const reset=async(e)=>{e.preventDefault();try{const r=await axios.post(API+"/auth/reset-password",{email,role,otp:otp.join(''),newPassword:np});nav('/success',{state:{title:'Password Reset Successful!',message:'Your password has been updated. Please login with your new password.',to:'/'}});}catch(e){setMsg(e.response?.data?.message||'Reset failed');}};
   return <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:bg,padding:20,fontFamily:'Segoe UI,system-ui,sans-serif'}}>
     <div style={{width:'100%',maxWidth:400,background:cardBg,border:cardBd,borderRadius:18,padding:'30px 28px',boxShadow:'0 24px 70px rgba(0,0,0,0.4)'}}>
       <div style={{display:'flex',justifyContent:'flex-end'}}><button onClick={toggle} style={{background:'transparent',border:'1px solid '+fBd,color:text,borderRadius:20,padding:'5px 12px',cursor:'pointer',fontSize:13}}>{dark?'☀️ Light':'🌙 Dark'}</button></div>
@@ -26,6 +29,10 @@ export default function ForgotPassword(){
       <p style={{color:sub,fontSize:13,margin:'0 0 6px',textAlign:'center'}}>{step===1?'Enter your registered email':'Enter OTP and choose a new password'}</p>
       {step===1?
       <form onSubmit={send}>
+        <label style={label}>Account Role</label>
+        <select value={role} onChange={e=>setRole(e.target.value)} style={input}>
+          <option>Admin</option><option>FleetManager</option><option>WarehouseManager</option><option>Driver</option><option>Client</option>
+        </select>
         <label style={label}>Registered Email</label>
         <input type="email" placeholder="you@company.com" style={input} onChange={e=>setEmail(e.target.value)} required/>
         <button disabled={sending} style={{width:'100%',padding:14,marginTop:16,borderRadius:10,border:'none',background:sending?'#64748b':'linear-gradient(90deg,#f59e0b,#f97316)',color:sending?'#e2e8f0':'#231303',fontWeight:800,fontSize:16,cursor:sending?'wait':'pointer',boxSizing:'border-box'}}>{sending?'SENDING...':'SEND OTP →'}</button>
