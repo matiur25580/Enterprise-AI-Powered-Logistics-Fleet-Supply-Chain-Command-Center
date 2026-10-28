@@ -8,6 +8,7 @@ export default function WarehouseManager(){
   const [list,setList]=useState([]); const [managers,setManagers]=useState([]);
   const [f,setF]=useState({name:'',location:'',totalCapacity:'',manager:''});
   const [msg,setMsg]=useState('');
+  const [stockEdits,setStockEdits]=useState({});
   const bg=dark?'#0a1128':'#eef2f9', card=dark?'#101d38':'#ffffff';
   const text=dark?'#eef3fb':'#0f1e38', sub=dark?'#93a7c9':'#5b6b87';
   const bd=dark?'1px solid #27406e':'1px solid #dbe4f0';
@@ -22,6 +23,11 @@ export default function WarehouseManager(){
   };
   useEffect(()=>{load();},[]);
   const ok=(m)=>{setMsg(m);setTimeout(()=>setMsg(''),3500);};
+  const saveStock=async(id)=>{try{
+    const v=stockEdits[id];if(v===undefined||v===''){ok('Enter a stock value');return;}
+    const r=await axios.put(API+'/warehouse/stock/'+id,{usedCapacity:Number(v)});
+    ok(r.data.message);setStockEdits(s=>{const n={...s};delete n[id];return n;});load();
+  }catch(e){ok(e.response?.data?.message||e.message);}};
   const add=async(e)=>{e.preventDefault();try{
     const r=await axios.post(API+'/warehouse/add',f);ok(r.data.message);
     setF({name:'',location:'',totalCapacity:'',manager:''});load();
@@ -62,11 +68,18 @@ export default function WarehouseManager(){
         <button style={btn}>+ Add Warehouse</button>
       </form>
       <div style={{overflowX:'auto'}}><table style={{width:'100%',borderCollapse:'collapse'}}>
-        <thead><tr><th style={th}>Name</th><th style={th}>Location</th><th style={th}>Capacity</th><th style={th}>Manager</th></tr></thead>
+        <thead><tr><th style={th}>Name</th><th style={th}>Location</th><th style={th}>Stock</th><th style={th}>Manager</th></tr></thead>
         <tbody>{list.map(w=>(
           <tr key={w._id}>
             <td style={td}><b>{w.name}</b></td><td style={td}>{w.location||'-'}</td>
-            <td style={td}>{w.usedCapacity||0} / {w.totalCapacity}{bar(w)}</td>
+            <td style={td}>{w.usedCapacity||0} / {w.totalCapacity}{bar(w)}
+              <div style={{display:'flex',gap:6,marginTop:8,alignItems:'center'}}>
+                <input type="number" min="0" max={w.totalCapacity} placeholder="Set stock"
+                  value={stockEdits[w._id]!==undefined?stockEdits[w._id]:''}
+                  onChange={e=>setStockEdits(s=>({...s,[w._id]:e.target.value}))}
+                  style={{...inp,margin:0,width:110,padding:'6px 8px',fontSize:12}}/>
+                <button onClick={()=>saveStock(w._id)} style={{...btn,padding:'6px 12px',fontSize:12}}>Update</button>
+              </div></td>
             <td style={td}>{(w.manager&&w.manager.fullName)||'-'}</td>
           </tr>))}
         </tbody></table></div>
