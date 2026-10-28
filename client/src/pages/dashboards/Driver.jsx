@@ -43,7 +43,12 @@ export default function Driver(){
     }
   };
   const setStatus=async(id,status)=>{try{
-    const r=await axios.put(API+'/trip/status/'+id,{status});ok(r.data.message);load();
+    const r=await axios.put(API+'/trip/status/'+id,{status});
+    const tr=trips.find(x=>x._id===id);
+    if(status==='Delivered'&&tr&&tr.bookingId){
+      try{await axios.put(API+'/booking/status/'+tr.bookingId,{status:'Delivered'});ok('Delivered! Client notified by email.');}catch(e){ok(r.data.message);}
+    } else ok(r.data.message);
+    load();
   }catch(e){ok(e.message);}};
   const active=trips.filter(t=>t.status==='OnGoing'||t.status==='Scheduled').length;
   const done=trips.filter(t=>t.status==='Delivered').length;

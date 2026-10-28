@@ -11,7 +11,7 @@ export default function FleetManager(){
   const [tab,setTab]=useState('vehicles');
   const [vehicles,setVehicles]=useState([]); const [trips,setTrips]=useState([]);
   const [drivers,setDrivers]=useState([]);
-  const [bookings,setBookings]=useState([]); const [bkId,setBkId]=useState(''); const [msg,setMsg]=useState('');
+  const [bookings,setBookings]=useState([]); const [msg,setMsg]=useState('');
   const [vf,setVf]=useState({vehicleNumber:'',type:'Truck',capacity:'',driver:''});
   const [tf,setTf]=useState({vehicle:'',driver:'',from:'',to:'',startDate:''});
   const bg=dark?'#0a1128':'#eef2f9', card=dark?'#101d38':'#ffffff';
@@ -39,7 +39,7 @@ export default function FleetManager(){
   }catch(e){ok(e.message);}};
   const addTrip=async(e)=>{e.preventDefault();try{
     const r=await axios.post(API+'/trip/create',tf);ok(r.data.message);
-    if(bkId){try{await axios.put(API+'/booking/status/'+bkId,{status:'Confirmed'});}catch(e){} setBkId('');}
+    if(tf.bookingId){try{await axios.put(API+'/booking/status/'+tf.bookingId,{status:'Confirmed'});}catch(e){}}
     setTf({vehicle:'',driver:'',from:'',to:'',startDate:''});load();
   }catch(e){ok(e.response?.data?.message||e.message);}};
   const tStatus=async(id,status)=>{try{
@@ -99,7 +99,7 @@ export default function FleetManager(){
             <td style={td}>{b.from} to {b.to}</td><td style={td}>{b.goods||'-'}</td>
             <td style={td}>{b.status||'Pending'}</td>
             <td style={td}>{(b.status||'Pending')==='Pending'||(b.status||'Pending')==='Confirmed'
-              ?<button onClick={()=>{setBkId(b._id);setTf({vehicle:'',driver:'',from:b.from||'',to:b.to||'',startDate:''});setTab('trips');window.scrollTo(0,0);}} style={{...btn,padding:'6px 12px',fontSize:12}}>Create Trip</button>
+              ?<button onClick={()=>{setTf({vehicle:'',driver:'',bookingId:b._id,from:b.from||'',to:b.to||'',startDate:''});setTab('trips');window.scrollTo(0,0);}} style={{...btn,padding:'6px 12px',fontSize:12}}>Create Trip</button>
               :<span style={{color:sub,fontSize:12}}>Converted</span>}</td>
           </tr>))}
         </tbody></table></div>
@@ -107,7 +107,7 @@ export default function FleetManager(){
     </div>}
     {tab==='trips'&&<div style={{background:card,border:bd,borderRadius:12,padding:16}}>
       <h3 style={{marginTop:0}}>Create Trip</h3>
-      {bkId&&<p style={{color:'#f59e0b',fontSize:14}}>Converting booking to trip — on create, booking will be marked Confirmed.</p>}
+      {tf.bookingId&&<p style={{color:'#f59e0b',fontSize:14}}>Converting booking to trip — on create, booking will be marked Confirmed.</p>}
       <form onSubmit={addTrip} style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))',gap:8,marginBottom:14}}>
         <select value={tf.vehicle} onChange={e=>setTf({...tf,vehicle:e.target.value})} style={inp} required>
           <option value="">Select Vehicle</option>
