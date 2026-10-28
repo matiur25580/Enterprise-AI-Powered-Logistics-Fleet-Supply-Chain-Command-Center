@@ -1,5 +1,5 @@
 import {useEffect,useState} from 'react';
-import AXX from "axios";
+import axios from "axios";
 const API=import.meta.env.VITE_API_URL||'http://localhost:5000/api';
 export default function Accountant(){
 const[dark,setDark]=useState(()=>{try{return localStorage.getItem('fc-theme')==='dark'}catch(e){return false}});
@@ -14,10 +14,10 @@ const inp={padding:'8px 10px',borderRadius:8,border:bd,background:dark?'#0b152b'
 const btn={padding:'9px 15px',borderRadius:8,border:'none',background:'linear-gradient(90deg,#f59e0b,#f97316)',color:'#231303',fontWeight:700,cursor:'pointer',fontSize:13};
 const th={textAlign:'left',padding:'9px',borderBottom:bd,color:sub,fontSize:11,textTransform:'uppercase',whiteSpace:'nowrap'};
 const td={padding:'9px',borderBottom:bd,fontSize:13,whiteSpace:'nowrap'};
-const load=async()=>{try{let r;try{r=await AXX.get(API+'/booking/all',H)}catch(e){r=await AXX.get(API+'/booking',H)}const d=r.data;setList(Array.isArray(d)?d:(d.bookings||d.data||[]))}catch(e){}};
+const load=async()=>{try{let r;try{r=await axios.get(API+'/booking/all',H)}catch(e){r=await axios.get(API+'/booking',H)}const d=r.data;setList(Array.isArray(d)?d:(d.bookings||d.data||[]))}catch(e){}};
 useEffect(()=>{load()},[]);
 const ok=m=>{setMsg(m);setTimeout(()=>setMsg(''),3000)};
-const save=async b=>{const e=ed[b._id]||{},pl={};if(e.a!==undefined&&e.a!=='')pl.amount=Number(e.a);if(e.p)pl.paymentStatus=e.p;if(!Object.keys(pl).length)return ok('Nothing to update');try{const r=await AXX.put(API+'/booking/billing/'+b._id,pl,H);ok(r.data.message||'Saved');setEd(s=>{const n={...s};delete n[b._id];return n});load()}catch(x){ok((x.response&&x.response.data&&x.response.data.message)||x.message)}};
+const save=async b=>{const e=ed[b._id]||{},pl={};if(e.a!==undefined&&e.a!=='')pl.amount=Number(e.a);if(e.p)pl.paymentStatus=e.p;if(!Object.keys(pl).length)return ok('Nothing to update');try{const r=await axios.put(API+'/booking/billing/'+b._id,pl,H);ok(r.data.message||'Saved');setEd(s=>{const n={...s};delete n[b._id];return n});load()}catch(x){ok((x.response&&x.response.data&&x.response.data.message)||x.message)}};
 const paid=list.filter(b=>(b.paymentStatus||'Unpaid')==='Paid'),unpaid=list.filter(b=>(b.paymentStatus||'Unpaid')!=='Paid');
 const rev=paid.reduce((s,b)=>s+(Number(b.amount)||0),0),due=unpaid.reduce((s,b)=>s+(Number(b.amount)||0),0);
 const fL=list.filter(b=>flt==='All'||(b.paymentStatus||'Unpaid')===flt);

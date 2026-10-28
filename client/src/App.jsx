@@ -8,7 +8,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Landing from './pages/Landing';
 import Admin from './pages/dashboards/Admin';import FleetManager from './pages/dashboards/FleetManager';
 import WarehouseManager from './pages/dashboards/WarehouseManager';import Driver from './pages/dashboards/Driver';import Client from './pages/dashboards/Client';
-import WarehouseManager from './pages/dashboards/WarehouseManager';import Driver from './pages/dashboards/Driver';import Accountant from './pages/dashboards/Accountant';
+import Accountant from './pages/dashboards/Accountant';
 export default function App(){
   return <ThemeProvider><AuthProvider><BrowserRouter>
     <Routes>
