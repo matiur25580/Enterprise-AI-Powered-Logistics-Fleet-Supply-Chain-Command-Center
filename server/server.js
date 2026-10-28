@@ -37,7 +37,7 @@ function strongPassword(req,res,next){
 app.use(auditNotify);
 // ---- enterprise security: brute-force guard + password policy ----
 // ---- enterprise security: brute-force guard + password policy ----
-app.use('/api/auth',authLimiter, strongPassword, authLimiter, strongPassword, require('./routes/auth'));
+app.use('/api/auth',authLimiter, strongPassword, require('./routes/auth'));
 app.use('/api/fleet',require('./routes/fleet'));
 app.use('/api/trip',require('./routes/trip'));
 app.use('/api/warehouse',require('./routes/warehouse'));
