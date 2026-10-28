@@ -1,11 +1,18 @@
-import {useEffect,useState} from 'react';import io from 'socket.io-client';import axios from 'axios';import {useAuth} from '../../context/AuthContext';import {useTheme} from '../../context/ThemeContext';
-const socket=io(import.meta.env.VITE_API_URL?.replace('/api','') || 'http://localhost:5000');
+import {useEffect,useState} from 'react';
+import io from 'socket.io-client';
+import axios from 'axios';
+import {useAuth} from '../../context/AuthContext';
+import {useTheme} from '../../context/ThemeContext';
+const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+const SOCKET_URL = API.replace('/api','');
+const socket=io(SOCKET_URL);
 export default function Admin(){
   const {logout}=useAuth();const {dark,toggle}=useTheme();const [live,setLive]=useState([]);const [stats,setStats]=useState({v:0,t:0,w:0});
-  useEffect(()=>{socket.on('fleet-location',(d)=>{setLive(p=>[...p.slice(-9),d]);});
-    axios.get('import.meta.env.VITE_API_URL || 'API'/fleet/all').then(r=>setStats(s=>({...s,v:r.data.length})));
-    axios.get('import.meta.env.VITE_API_URL || 'API'/trip/all').then(r=>setStats(s=>({...s,t:r.data.length})));
-    axios.get('import.meta.env.VITE_API_URL || 'API'/warehouse/all').then(r=>setStats(s=>({...s,w:r.data.length})));
+  useEffect(()=>{
+    socket.on('fleet-location',(d)=>{setLive(p=>[...p.slice(-9),d]);});
+    axios.get(API+"/fleet/all").then(r=>setStats(s=>({...s,v:r.data.length})));
+    axios.get(API+"/trip/all").then(r=>setStats(s=>({...s,t:r.data.length})));
+    axios.get(API+"/warehouse/all").then(r=>setStats(s=>({...s,w:r.data.length})));
   },[]);
   return <div style={{padding:20}}><button onClick={toggle}>{dark?'☀️':'🌙'}</button><button onClick={logout} style={{float:'right'}}>Logout</button>
   <h1>Admin Dashboard - Command Center</h1>
