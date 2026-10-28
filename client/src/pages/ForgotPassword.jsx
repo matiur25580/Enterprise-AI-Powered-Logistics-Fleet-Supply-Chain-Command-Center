@@ -34,12 +34,14 @@ export default function ForgotPassword(){
           <option>Admin</option><option>FleetManager</option><option>WarehouseManager</option><option>Driver</option><option>Client</option>
         </select>
         <label style={label}>Registered Email</label>
-        <input type="email" placeholder="you@company.com" style={input} onChange={e=>setEmail(e.target.value)} required/>
-        <button disabled={sending} style={{width:'100%',padding:14,marginTop:16,borderRadius:10,border:'none',background:sending?'#64748b':'linear-gradient(90deg,#f59e0b,#f97316)',color:sending?'#e2e8f0':'#231303',fontWeight:800,fontSize:16,cursor:sending?'wait':'pointer',boxSizing:'border-box'}}>{sending?'SENDING...':'SEND OTP →'}</button>
-      </form>:
-      <form onSubmit={reset}>
-        <label style={label}>6-Digit OTP</label>
-        <input placeholder="Enter OTP from email" inputMode="numeric" style={{...input,textAlign:'center',letterSpacing:4,fontWeight:700}} onChange={e=>setOtp(e.target.value)} required/>
+        <div onPaste={e=>{e.preventDefault();const d=e.clipboardData.getData("text").replace(/\D/g,"").slice(0,6).split("");const n=["","","","","",""];d.forEach((c,i)=>{n[i]=c});setOtp(n);}} style={{display:"flex",gap:8,justifyContent:"center"}}>
+          {[0,1,2,3,4,5].map(i=>(
+            <input key={i} inputMode="numeric" maxLength={1} autoComplete="one-time-code" value={otp[i]||""}
+              onChange={e=>{const v=e.target.value.replace(/\D/g,"").slice(-1);const n=[...otp];n[i]=v;setOtp(n);if(v){const nx=e.target.nextElementSibling;if(nx)nx.focus();}}}
+              onKeyDown={e=>{if(e.key==="Backspace"&&!otp[i]){const pv=e.target.previousElementSibling;if(pv)pv.focus();}}}
+              style={{...input,width:46,padding:"12px 0",textAlign:"center",fontSize:20,fontWeight:800}} />
+          ))}
+        </div>
         <label style={label}>New Password</label>
         <input type="password" placeholder="Choose a new password" style={input} onChange={e=>setNp(e.target.value)} required/>
         <button style={{width:'100%',padding:14,marginTop:16,borderRadius:10,border:'none',background:'linear-gradient(90deg,#16a34a,#22c55e)',color:'#fff',fontWeight:800,fontSize:16,cursor:'pointer',boxSizing:'border-box'}}>RESET PASSWORD</button>
