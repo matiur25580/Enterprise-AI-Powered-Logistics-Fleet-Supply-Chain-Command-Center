@@ -43,7 +43,7 @@ export default function WarehouseManager(){
   return (
   <div style={{minHeight:'100vh',background:bg,color:text,padding:16,fontFamily:'Segoe UI,system-ui,sans-serif'}}>
     <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14,flexWrap:'wrap',gap:8}}>
-      <h1 style={{margin:0,fontSize:21}}>Warehouse Manager Dashboard</h1>
+      <div style={{display:'flex',alignItems:'center',gap:10,flexWrap:'wrap'}}><h1 style={{margin:0,fontSize:21}}>Warehouse Manager Dashboard</h1><span style={{background:'linear-gradient(90deg,#f59e0b,#f97316)',color:'#231303',fontWeight:800,fontSize:11,padding:'5px 14px',borderRadius:20,letterSpacing:1.5}}>WAREHOUSE MANAGER</span></div>
       <div><button onClick={toggle} style={{...btn,background:card,color:text,border:bd,marginRight:8}}>{dark?'Light':'Dark'}</button>
       <button onClick={logout} style={{...btn,background:'#dc2626',color:'#fff'}}>Logout</button></div>
     </div>
