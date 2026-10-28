@@ -18,4 +18,6 @@ r.put('/status/:id',async(req,res)=>{try{
     if(b&&req.body.status==='Delivered'&&b.email){sendMail(b.email,'Shipment Delivered - '+b.invoiceNo,
       '<h2>FleetCommand</h2><p>Hi '+(b.clientName||'Customer')+',</p><p>Your shipment <b>'+b.invoiceNo+'</b> ('+b.from+' to '+b.to+') has been <b>delivered</b>.</p><p>Thank you for choosing FleetCommand.</p>').catch(function(){});}
     res.json({message:'Booking status updated successfully',success:true});}catch(e){res.status(500).json({message:e.message});}});
+
+r.put('/billing/:id',async(req,res)=>{try{const u={};if(req.body.amount!==undefined&&req.body.amount!=='')u.amount=Number(req.body.amount);if(req.body.paymentStatus)u.paymentStatus=req.body.paymentStatus;const b=await Booking.findByIdAndUpdate(req.params.id,u,{new:true});res.json({message:'Billing updated',success:true,booking:b})}catch(e){res.status(500).json({message:e.message})}});
 module.exports=r;

@@ -34,7 +34,7 @@ export default function Admin(){
     setVehicles(await g('/fleet/all')); setTrips(await g('/trip/all'));
     setWarehouses(await g('/warehouse/all')); setBookings(await g('/booking/all'));
     setDrivers(await g('/auth/by-role/Driver')); setManagers(await g('/auth/by-role/WarehouseManager'));
-    const u={};for(const r of ['Admin','FleetManager','WarehouseManager','Driver','Client']){u[r]=await g('/auth/by-role/'+r);}setUsers(u);
+    const u={};for(const r of ['Admin','FleetManager','WarehouseManager','Driver','Client','Accountant']){u[r]=await g('/auth/by-role/'+r);}setUsers(u);
   };
   useEffect(()=>{load();socket.on('fleet-location',(d)=>{setLive(p=>[...p.slice(-9),d]);});},[]);
   const ok=(m)=>{setMsg(m);setTimeout(()=>setMsg(''),3500);};
@@ -259,7 +259,7 @@ export default function Admin(){
     {tab==='users'&&<div style={{background:card,border:bd,borderRadius:12,padding:16}}>
       <h3 style={{marginTop:0}}>User Directory</h3>
       <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:14}}>
-        {['Admin','FleetManager','WarehouseManager','Driver','Client'].map(r=>(
+        {['Admin','FleetManager','WarehouseManager','Driver','Client','Accountant'].map(r=>(
           <div key={r} style={{border:bd,borderRadius:10,padding:14}}>
             <div style={{fontWeight:800,marginBottom:6}}>{r} <span style={{color:'#f59e0b'}}>({(users[r]||[]).length})</span></div>
             {(users[r]||[]).map(x=>(

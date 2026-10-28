@@ -32,6 +32,7 @@ export default function Landing(){
     ['Warehouse Manager','Warehouse network, capacity tracking and stock management.'],
     ['Driver','Assigned trips, live location sharing and one-tap delivery confirmation.'],
     ['Client','Book shipments, track status live and download PDF invoices.'],
+    ['Accountant','Freight billing, payment collection tracking and revenue analytics.'],
   ];
   const steps=[
     ['1','Client books','Shipment booked in seconds with instant email confirmation and invoice.'],
@@ -77,7 +78,7 @@ export default function Landing(){
       </div>
     </section>
     <section style={{maxWidth:1080,margin:'0 auto',padding:'0 20px 50px'}}>
-      <h2 style={{textAlign:'center',fontSize:28,marginBottom:28}}>Five portals, one command center</h2>
+      <h2 style={{textAlign:'center',fontSize:28,marginBottom:28}}>Six portals, one command center</h2>
       <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:14}}>
         {roles.map(r=>(
           <div key={r[0]} style={{background:grad,borderRadius:12,padding:2}}>
