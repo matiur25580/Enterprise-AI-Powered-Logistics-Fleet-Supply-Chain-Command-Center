@@ -57,7 +57,7 @@ export default function Admin(){
     setWf({name:'',location:'',totalCapacity:'',manager:''});load();
   }catch(e){ok(e.response?.data?.message||e.message);}};
   const stats=[['Vehicles',vehicles.length,'vehicles'],['Trips',trips.length,'trips'],['Warehouses',warehouses.length,'warehouses'],['Bookings',bookings.length,'bookings']];
-  const tabs=[['vehicles','Vehicles'],['trips','Trips'],['warehouses','Warehouses'],['bookings','Bookings'],['live','Live Tracking']];
+  const tabs=[['vehicles','Vehicles'],['trips','Trips'],['warehouses','Warehouses'],['bookings','Bookings'],['live','Live Tracking'],['reports','Reports']];
   const insights=[];
   const totV=vehicles.length;
   const util=totV?Math.round(vehicles.filter(v=>v.status==='OnTrip'||v.status==='Active').length/totV*100):0;
@@ -71,6 +71,18 @@ export default function Admin(){
   const noDriver=trips.filter(x=>!x.driver).length;
   if(noDriver)insights.push(['Trips without driver',noDriver,'Assign drivers to unassigned trips']);
   if(insights.length===1&&totV===0)insights.push(['Getting started','-','Add vehicles, warehouses and drivers to activate full analytics']);
+  const last14=[];for(let i=13;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);last14.push(d);}
+  const bByDay=last14.map(d=>{const k=d.toDateString();return {d, n:bookings.filter(b=>b.createdAt&&new Date(b.createdAt).toDateString()===k).length};});
+  const maxB=Math.max(1,...bByDay.map(x=>x.n));
+  const tByStatus={};trips.forEach(x=>{tByStatus[x.status||'Scheduled']=(tByStatus[x.status||'Scheduled']||0)+1;});
+  const vByType={};vehicles.forEach(x=>{vByType[x.type||'Truck']=(vByType[x.type||'Truck']||0)+1;});
+  const vByStatus={};vehicles.forEach(x=>{vByStatus[x.status||'Idle']=(vByStatus[x.status||'Idle']||0)+1;});
+  const totT=trips.length||1, totV2=vehicles.length||1;
+  const barRow=(label,n,tot,color)=>(
+    <div style={{marginBottom:8}}><div style={{display:'flex',justifyContent:'space-between',fontSize:13,marginBottom:4}}>
+      <span>{label}</span><span style={{color:sub}}>{n}</span></div>
+      <div style={{height:10,background:dark?'#0b152b':'#e5eaf2',borderRadius:5}}>
+        <div style={{height:10,width:Math.round(n/tot*100)+'%',background:color,borderRadius:5}}/></div></div>);
   return (
   <div style={{minHeight:'100vh',background:bg,color:text,padding:16,fontFamily:'Segoe UI,system-ui,sans-serif'}}>
     <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14,flexWrap:'wrap',gap:8}}>
@@ -190,6 +202,37 @@ export default function Admin(){
           </tr>))}
         </tbody></table></div>
       {bookings.length===0&&<p style={{color:sub,textAlign:'center'}}>No bookings yet.</p>}
+    </div>}
+    {tab==='reports'&&<div>
+      <div style={{background:card,border:bd,borderRadius:12,padding:16,marginBottom:14}}>
+        <h3 style={{marginTop:0}}>Bookings — Last 14 Days</h3>
+        <div style={{display:'flex',alignItems:'flex-end',gap:4,height:140,paddingTop:10}}>
+          {bByDay.map((x,i)=>(
+            <div key={i} style={{flex:1,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'flex-end',height:'100%'}}>
+              <div style={{fontSize:10,color:sub}}>{x.n>0?x.n:''}</div>
+              <div title={x.d.toLocaleDateString()+': '+x.n+' bookings'}
+                style={{width:'100%',maxWidth:28,height:Math.max(4,Math.round(x.n/maxB*100))+'%',background:'linear-gradient(180deg,#f59e0b,#f97316)',borderRadius:'4px 4px 0 0'}}/>
+              <div style={{fontSize:9,color:sub,marginTop:4}}>{x.d.getDate()}/{x.d.getMonth()+1}</div>
+            </div>))}
+        </div>
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))',gap:14}}>
+        <div style={{background:card,border:bd,borderRadius:12,padding:16}}>
+          <h3 style={{marginTop:0}}>Trips by Status</h3>
+          {Object.keys(tByStatus).length===0&&<p style={{color:sub,fontSize:13}}>No trips yet.</p>}
+          {Object.entries(tByStatus).map(([k,v])=>barRow(k,v,totT,'linear-gradient(90deg,#3b82f6,#2563eb)'))}
+        </div>
+        <div style={{background:card,border:bd,borderRadius:12,padding:16}}>
+          <h3 style={{marginTop:0}}>Vehicles by Type</h3>
+          {Object.keys(vByType).length===0&&<p style={{color:sub,fontSize:13}}>No vehicles yet.</p>}
+          {Object.entries(vByType).map(([k,v])=>barRow(k,v,totV2,'linear-gradient(90deg,#22c55e,#16a34a)'))}
+        </div>
+        <div style={{background:card,border:bd,borderRadius:12,padding:16}}>
+          <h3 style={{marginTop:0}}>Vehicles by Status</h3>
+          {Object.keys(vByStatus).length===0&&<p style={{color:sub,fontSize:13}}>No vehicles yet.</p>}
+          {Object.entries(vByStatus).map(([k,v])=>barRow(k,v,totV2,'linear-gradient(90deg,#a855f7,#7c3aed)'))}
+        </div>
+      </div>
     </div>}
     {tab==='live'&&<div style={{background:card,border:bd,borderRadius:12,padding:16}}>
       <h3 style={{marginTop:0}}>Live Fleet Tracking</h3>
