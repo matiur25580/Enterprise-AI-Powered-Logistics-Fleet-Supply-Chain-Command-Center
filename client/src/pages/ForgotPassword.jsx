@@ -26,7 +26,8 @@ export default function ForgotPassword(){
         <p style={{margin:0,fontSize:13,color:sub}}>Logistics • Fleet • Supply Chain</p>
       </div>
       <h2 style={{color:text,fontSize:18,margin:'0 0 6px',textAlign:'center'}}>Reset Password</h2>
-      <p style={{color:sub,fontSize:13,margin:'0 0 6px',textAlign:'center'}}>{step===1?
+      <p style={{color:sub,fontSize:13,margin:'0 0 6px',textAlign:'center'}}>{step===1?'Enter your registered email':'Enter OTP and choose a new password'}</p>
+      {step===1?
       <form onSubmit={send}>
         <label style={label}>Account Role</label>
         <select value={role} onChange={e=>setRole(e.target.value)} style={input}>
