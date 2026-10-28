@@ -41,7 +41,7 @@ A full-stack enterprise logistics platform connecting clients, fleet managers, w
 - Protected routes per role, unique ID per registration (e.g. `AMR29081998`)
 
 ## Tech Stack
-- **Frontend:** React, React Router, 【entity-Axios¦canonical_name=Axios】, Socket.io-client (Vercel)
+- **Frontend:** React, React Router, axios, Socket.io-client (Vercel)
 - **Backend:** Node.js, Express, Socket.io, PDFKit, Mongoose (Render)
 - **Database:** MongoDB Atlas
 - **Email:** Mailjet HTTPS API
