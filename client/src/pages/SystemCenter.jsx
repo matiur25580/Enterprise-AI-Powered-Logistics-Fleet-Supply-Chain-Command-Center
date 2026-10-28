@@ -24,23 +24,24 @@ const loadVehicles=async()=>{try{const r=await fetch(API+'/fleet');const d=await
 const loadDue=async()=>{try{const r=await fetch(API+'/maintenance/due');const d=await r.json();setDue(Array.isArray(d)?d:[]);}catch(e){}};
 useEffect(()=>{loadAudit();loadDocs();loadVehicles();loadDue();},[]);
 const clearAudit=async()=>{if(!window.confirm('Clear all audit logs?'))return;
-await fetch(API+'/audit/clear?role='+me.role,{method:'DELETE'});loadAudit();};
+await fetch(API+'/audit/clear?role='+me.role,{method:'DELETE'});ok('Audit log cleared successfully');loadAudit();};
 const saveDoc=async(id)=>{const e=docEdit[id]||{};if(!Object.keys(e).length)return;
 await fetch(API+'/documents/'+id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(e)});
-setDocEdit(s=>{const n={...s};delete n[id];return n;});loadDocs();};
+setDocEdit(s=>{const n={...s};delete n[id];return n;});ok('Document updated successfully');loadDocs();};
 const addFuel=async()=>{if(!form.vehicle||!form.liters)return ok('Vehicle and liters required');
 await fetch(API+'/maintenance/fuel',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...form,liters:Number(form.liters),cost:Number(form.cost)||0,odometer:Number(form.odometer)||0})});
-const v=form.vehicle;setForm({vehicle:'',liters:'',cost:'',odometer:'',note:''});loadFuelHist(v);};
+const v=form.vehicle;setForm({vehicle:'',liters:'',cost:'',odometer:'',note:''});ok('Fuel log added successfully');loadFuelHist(v);};
 const loadFuelHist=async(vid)=>{if(!vid)return;try{const r=await fetch(API+'/maintenance/fuel/'+vid);const d=await r.json();setFuelHist(Array.isArray(d)?d:[]);}catch(e){}};
 const saveService=async()=>{if(!svc.vehicle||!svc.nextServiceDue)return;
 const body={nextServiceDue:svc.nextServiceDue};if(svc.odometer)body.odometer=Number(svc.odometer);
 await fetch(API+'/maintenance/service/'+svc.vehicle,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-setSvc({vehicle:'',nextServiceDue:'',odometer:''});loadDue();};
+setSvc({vehicle:'',nextServiceDue:'',odometer:''});ok('Service schedule saved successfully');loadDue();};
 const pdfAudit=()=>exportPDF('Audit Log',['Time','Actor','Role','Action','Details'],audit.map(a=>[new Date(a.createdAt).toLocaleString(),a.actor||'',a.role||'',a.action||'',(a.details||'').slice(0,60)]),'audit-log.pdf');
 const pdfDocs=()=>exportPDF('Document Expiry',['Vehicle','Document','Expiry','Status'],docs.flatMap(v=>v.expiring.map(e=>[v.vehicleNo,e.name,new Date(e.expiry).toLocaleDateString(),e.overdue?'OVERDUE':'Expiring'])),'doc-expiry.pdf');
 const vname=v=>v.vehicleNo||v.regNo||v.number||v.vehicleNumber||String(v._id).slice(-6);
 const tabs=[['docs','Documents'],['fuel','Fuel Log'],['maint','Maintenance'],['audit','Audit Log']];
 return(<div style={{minHeight:'100vh',background:'#0a1128',color:'#e2e8f0',padding:16,fontFamily:'Segoe UI,system-ui,sans-serif'}}>
+{msg&&<div style={{background:'#0e1a2b',border:'1px solid #1e3a5f',borderRadius:8,padding:10,margin:'0 0 12px',textAlign:'center',fontSize:14,color:'#fff'}}>{msg}</div>}
 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:12}}>
 <div><h1 style={{margin:0}}>System Center</h1><div style={{color:'#94a3b8',fontSize:12}}>Audit, Documents, Fuel, Maintenance</div></div>
 <div style={{display:'flex',gap:8,alignItems:'center'}}><NotifBell/>
