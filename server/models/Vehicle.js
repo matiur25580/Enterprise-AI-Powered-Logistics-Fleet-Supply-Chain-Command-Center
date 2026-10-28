@@ -6,4 +6,6 @@ const v=new mongoose.Schema({
   status:{type:String,enum:['Active','Maintenance','OnTrip','Idle'],default:'Idle'},
   lastLocation:{lat:Number,lng:Number}
 },{timestamps:true});
+
+v.add({ insuranceExpiry: Date, fitnessExpiry: Date, permitExpiry: Date, pollutionExpiry: Date, odometer: {type:Number, default:0}, nextServiceDue: Date });
 module.exports=mongoose.model('Vehicle',v);

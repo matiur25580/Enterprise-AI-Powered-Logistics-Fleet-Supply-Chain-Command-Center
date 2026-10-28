@@ -9,6 +9,7 @@ import Landing from './pages/Landing';
 import Admin from './pages/dashboards/Admin';import FleetManager from './pages/dashboards/FleetManager';
 import WarehouseManager from './pages/dashboards/WarehouseManager';import Driver from './pages/dashboards/Driver';import Client from './pages/dashboards/Client';
 import Accountant from './pages/dashboards/Accountant';
+import SystemCenter from './pages/SystemCenter';
 export default function App(){
   return <ThemeProvider><AuthProvider><BrowserRouter>
     <Routes>
@@ -22,7 +23,8 @@ export default function App(){
       <Route path="/dashboard/Driver" element={<ProtectedRoute role="Driver"><Driver/></ProtectedRoute>}/>
       <Route path="/dashboard/Client" element={<ProtectedRoute role="Client"><Client/></ProtectedRoute>}/>
       <Route path="/dashboard/Accountant" element={<ProtectedRoute role="Accountant"><Accountant/></ProtectedRoute>}/>
-      <Route path="/success" element={<Success/>}/>
+      <Route path="/system-center" element={<ProtectedRoute role="Admin"><SystemCenter/></ProtectedRoute>} />
+          <Route path="/success" element={<Success/>}/>
     </Routes>
   </BrowserRouter></AuthProvider></ThemeProvider>;
 }

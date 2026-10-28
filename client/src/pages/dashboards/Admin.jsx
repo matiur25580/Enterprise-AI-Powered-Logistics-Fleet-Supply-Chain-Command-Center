@@ -3,6 +3,7 @@ import io from 'socket.io-client';
 import axios from 'axios';
 import {useAuth} from '../../context/AuthContext';
 import {useTheme} from '../../context/ThemeContext';
+import NotifBell from '../../components/NotifBell';
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const SOCKET_URL = API.replace('/api','');
 const socket=io(SOCKET_URL);
