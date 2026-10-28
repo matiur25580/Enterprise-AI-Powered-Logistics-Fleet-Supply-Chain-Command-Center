@@ -43,7 +43,7 @@ export default function ForgotPassword(){
           ))}
         </div>
         <label style={label}>New Password</label>
-        <input type="password" placeholder="Choose a new password" style={input} onChange={e=>setNp(e.target.value)} required/>
+        <input autoComplete="new-password" type="password" placeholder="Choose a new password" style={input} onChange={e=>setNp(e.target.value)} required/>
         <button style={{width:'100%',padding:14,marginTop:16,borderRadius:10,border:'none',background:'linear-gradient(90deg,#16a34a,#22c55e)',color:'#fff',fontWeight:800,fontSize:16,cursor:'pointer',boxSizing:'border-box'}}>RESET PASSWORD</button>
       </form>}
       {msg&&<p style={{color:msg.includes('success')||msg.includes('sent')?'#22c55e':'#f87171',marginTop:14,textAlign:'center',fontSize:14}}>{msg}</p>}
