@@ -3,7 +3,7 @@ export default function Login(){
   const [f,setF]=useState({email:'',password:'',role:'Admin'});
   const {login}=useAuth();const {dark,toggle}=useTheme();const [msg,setMsg]=useState('');
   const submit=async(e)=>{e.preventDefault();try{
-    const r=await axios.post('http://localhost:5000/api/auth/login',f);
+    const r=await axios.post('import.meta.env.VITE_API_URL || 'http://localhost:5000/api'/auth/login',f);
     setMsg(r.data.message);login(r.data);window.location.href='/dashboard/'+r.data.role;
   }catch(e){setMsg(e.response?.data?.message||'Error');}};
   return <div style={{padding:40,maxWidth:400,margin:'auto'}}>
