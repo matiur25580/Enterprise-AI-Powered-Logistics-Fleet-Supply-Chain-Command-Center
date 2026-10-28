@@ -4,6 +4,7 @@ import axios from 'axios';
 import {useAuth} from '../../context/AuthContext';
 import {useTheme} from '../../context/ThemeContext';
 import NotifBell from '../../components/NotifBell';
+import ForecastChart from '../../components/ForecastChart';
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const SOCKET_URL = API.replace('/api','');
 const socket=io(SOCKET_URL);
@@ -239,6 +240,7 @@ export default function Admin(){
             </div>))}
         </div>
       </div>
+      <ForecastChart card={card} bd={bd} sub={sub}/>
       <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))',gap:14}}>
         <div style={{background:card,border:bd,borderRadius:12,padding:16}}>
           <h3 style={{marginTop:0}}>Trips by Status</h3>
