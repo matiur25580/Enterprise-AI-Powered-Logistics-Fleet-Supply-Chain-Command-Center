@@ -16,6 +16,7 @@ export default function Admin(){
   const [warehouses,setWarehouses]=useState([]); const [bookings,setBookings]=useState([]);
   const [drivers,setDrivers]=useState([]); const [managers,setManagers]=useState([]);
   const [live,setLive]=useState([]); const [msg,setMsg]=useState('');
+  const [q,setQ]=useState({v:'',t:'',w:'',b:''});
   const [vf,setVf]=useState({vehicleNumber:'',type:'Truck',capacity:'',driver:''});
   const [tf,setTf]=useState({vehicle:'',driver:'',from:'',to:'',startDate:''});
   const [wf,setWf]=useState({name:'',location:'',totalCapacity:'',manager:''});
@@ -58,6 +59,10 @@ export default function Admin(){
     setWf({name:'',location:'',totalCapacity:'',manager:''});load();
   }catch(e){ok(e.response?.data?.message||e.message);}};
   const stats=[['Vehicles',vehicles.length,'vehicles'],['Trips',trips.length,'trips'],['Warehouses',warehouses.length,'warehouses'],['Bookings',bookings.length,'bookings']];
+  const fV=vehicles.filter(x=>((x.vehicleNumber||'')+' '+(x.type||'')+' '+(x.capacity||'')+' '+((x.driver&&x.driver.fullName)||'')).toLowerCase().includes(q.v.toLowerCase()));
+  const fT=trips.filter(x=>(((x.vehicle&&x.vehicle.vehicleNumber)||'')+' '+(x.from||'')+' '+(x.to||'')+' '+((x.driver&&x.driver.fullName)||'')).toLowerCase().includes(q.t.toLowerCase()));
+  const fW=warehouses.filter(x=>((x.name||'')+' '+(x.location||'')).toLowerCase().includes(q.w.toLowerCase()));
+  const fB=bookings.filter(x=>((x.invoiceNo||'')+' '+(x.clientName||'')+' '+(x.from||'')+' '+(x.to||'')).toLowerCase().includes(q.b.toLowerCase()));
   const tabs=[['vehicles','Vehicles'],['trips','Trips'],['warehouses','Warehouses'],['bookings','Bookings'],['live','Live Tracking'],['reports','Reports']];
   const insights=[];
   const totV=vehicles.length;
@@ -121,9 +126,10 @@ export default function Admin(){
         </select>
         <button style={btn}>+ Add Vehicle</button>
       </form>
+      <input placeholder="Search..." value={q.v} onChange={e=>setQ({...q,v:e.target.value})} style={{...inp,maxWidth:280,marginBottom:10}}/>
       <div style={{overflowX:'auto'}}><table style={{width:'100%',borderCollapse:'collapse'}}>
         <thead><tr><th style={th}>Vehicle No</th><th style={th}>Type</th><th style={th}>Capacity</th><th style={th}>Driver</th><th style={th}>Status</th><th style={th}>Action</th></tr></thead>
-        <tbody>{vehicles.map(v=>(
+        <tbody>{fV.map(v=>(
           <tr key={v._id}>
             <td style={td}><b>{v.vehicleNumber}</b></td><td style={td}>{v.type}</td><td style={td}>{v.capacity||'-'}</td>
             <td style={td}>{(v.driver&&v.driver.fullName)||'-'}</td>
@@ -131,7 +137,7 @@ export default function Admin(){
             <td style={td}><button onClick={()=>delVehicle(v._id)} style={{...btn,background:'#dc2626',color:'#fff',padding:'6px 12px'}}>Delete</button></td>
           </tr>))}
         </tbody></table></div>
-      {vehicles.length===0&&<p style={{color:sub,textAlign:'center'}}>No vehicles yet. Add your first vehicle above.</p>}
+      {fV.length===0&&<p style={{color:sub,textAlign:'center'}}>No vehicles yet. Add your first vehicle above.</p>}
     </div>}
     {tab==='trips'&&<div style={{background:card,border:bd,borderRadius:12,padding:16}}>
       <h3 style={{marginTop:0}}>Create Trip</h3>
@@ -149,9 +155,10 @@ export default function Admin(){
         <input type="date" value={tf.startDate} onChange={e=>setTf({...tf,startDate:e.target.value})} style={inp}/>
         <button style={btn}>+ Create Trip</button>
       </form>
+      <input placeholder="Search..." value={q.t} onChange={e=>setQ({...q,t:e.target.value})} style={{...inp,maxWidth:280,marginBottom:10}}/>
       <div style={{overflowX:'auto'}}><table style={{width:'100%',borderCollapse:'collapse'}}>
         <thead><tr><th style={th}>Vehicle</th><th style={th}>Driver</th><th style={th}>Route</th><th style={th}>Status</th><th style={th}>Start Date</th></tr></thead>
-        <tbody>{trips.map(t=>(
+        <tbody>{fT.map(t=>(
           <tr key={t._id}>
             <td style={td}><b>{(t.vehicle&&t.vehicle.vehicleNumber)||'-'}</b></td>
             <td style={td}>{(t.driver&&t.driver.fullName)||'-'}</td>
@@ -160,7 +167,7 @@ export default function Admin(){
             <td style={td}>{t.startDate?new Date(t.startDate).toLocaleDateString():'-'}</td>
           </tr>))}
         </tbody></table></div>
-      {trips.length===0&&<p style={{color:sub,textAlign:'center'}}>No trips yet.</p>}
+      {fT.length===0&&<p style={{color:sub,textAlign:'center'}}>No trips yet.</p>}
     </div>}
     {tab==='warehouses'&&<div style={{background:card,border:bd,borderRadius:12,padding:16}}>
       <h3 style={{marginTop:0}}>Add Warehouse</h3>
@@ -174,9 +181,10 @@ export default function Admin(){
         </select>
         <button style={btn}>+ Add Warehouse</button>
       </form>
+      <input placeholder="Search..." value={q.w} onChange={e=>setQ({...q,w:e.target.value})} style={{...inp,maxWidth:280,marginBottom:10}}/>
       <div style={{overflowX:'auto'}}><table style={{width:'100%',borderCollapse:'collapse'}}>
         <thead><tr><th style={th}>Name</th><th style={th}>Location</th><th style={th}>Capacity Used</th><th style={th}>Manager</th></tr></thead>
-        <tbody>{warehouses.map(w=>(
+        <tbody>{fW.map(w=>(
           <tr key={w._id}>
             <td style={td}><b>{w.name}</b></td><td style={td}>{w.location||'-'}</td>
             <td style={td}>{w.usedCapacity||0} / {w.totalCapacity}
@@ -186,13 +194,14 @@ export default function Admin(){
             <td style={td}>{(w.manager&&w.manager.fullName)||'-'}</td>
           </tr>))}
         </tbody></table></div>
-      {warehouses.length===0&&<p style={{color:sub,textAlign:'center'}}>No warehouses yet.</p>}
+      {fW.length===0&&<p style={{color:sub,textAlign:'center'}}>No warehouses yet.</p>}
     </div>}
     {tab==='bookings'&&<div style={{background:card,border:bd,borderRadius:12,padding:16}}>
       <h3 style={{marginTop:0}}>All Bookings ({bookings.length})</h3>
+      <input placeholder="Search..." value={q.b} onChange={e=>setQ({...q,b:e.target.value})} style={{...inp,maxWidth:280,marginBottom:10}}/>
       <div style={{overflowX:'auto'}}><table style={{width:'100%',borderCollapse:'collapse'}}>
         <thead><tr><th style={th}>Client</th><th style={th}>Route</th><th style={th}>Goods</th><th style={th}>Weight</th><th style={th}>Status</th><th style={th}>Date</th><th style={th}>Action</th></tr></thead>
-        <tbody>{bookings.map(b=>(
+        <tbody>{fB.map(b=>(
           <tr key={b._id}>
             <td style={td}>{b.name||b.clientName||b.fullName||'-'}</td>
             <td style={td}>{b.from} to {b.to}</td>
@@ -202,7 +211,7 @@ export default function Admin(){
             <td style={td}><button onClick={()=>{setTf({vehicle:'',driver:'',bookingId:b._id,from:b.from||'',to:b.to||'',startDate:''});setTab('trips');window.scrollTo(0,0);}} style={{...btn,padding:'6px 12px',fontSize:12}}>Create Trip</button></td>
           </tr>))}
         </tbody></table></div>
-      {bookings.length===0&&<p style={{color:sub,textAlign:'center'}}>No bookings yet.</p>}
+      {fB.length===0&&<p style={{color:sub,textAlign:'center'}}>No bookings yet.</p>}
     </div>}
     {tab==='reports'&&<div>
       <div style={{background:card,border:bd,borderRadius:12,padding:16,marginBottom:14}}>
