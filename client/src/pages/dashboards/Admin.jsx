@@ -58,6 +58,19 @@ export default function Admin(){
   }catch(e){ok(e.response?.data?.message||e.message);}};
   const stats=[['Vehicles',vehicles.length,'vehicles'],['Trips',trips.length,'trips'],['Warehouses',warehouses.length,'warehouses'],['Bookings',bookings.length,'bookings']];
   const tabs=[['vehicles','Vehicles'],['trips','Trips'],['warehouses','Warehouses'],['bookings','Bookings'],['live','Live Tracking']];
+  const insights=[];
+  const totV=vehicles.length;
+  const util=totV?Math.round(vehicles.filter(v=>v.status==='OnTrip'||v.status==='Active').length/totV*100):0;
+  insights.push(['Fleet utilization',util+'%',util<50?'Assign idle vehicles to pending trips':'Fleet is well utilized']);
+  const idle=vehicles.filter(v=>v.status==='Idle');
+  if(idle.length)insights.push(['Idle vehicles',idle.length,idle.slice(0,3).map(v=>v.vehicleNumber).join(', ')+(idle.length>3?' and more':'')]);
+  const full=warehouses.filter(w=>w.totalCapacity&&((w.usedCapacity||0)/w.totalCapacity)>0.85);
+  if(full.length)insights.push(['Warehouses near full capacity',full.length,full.map(w=>w.name).join(', ')]);
+  const pending=bookings.filter(b=>(b.status||'Pending')==='Pending').length;
+  if(pending)insights.push(['Pending bookings',pending,'Review and confirm bookings, then create trips']);
+  const noDriver=trips.filter(x=>!x.driver).length;
+  if(noDriver)insights.push(['Trips without driver',noDriver,'Assign drivers to unassigned trips']);
+  if(insights.length===1&&totV===0)insights.push(['Getting started','-','Add vehicles, warehouses and drivers to activate full analytics']);
   return (
   <div style={{minHeight:'100vh',background:bg,color:text,padding:16,fontFamily:'Segoe UI,system-ui,sans-serif'}}>
     <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:14,flexWrap:'wrap',gap:8}}>
@@ -76,7 +89,12 @@ export default function Admin(){
         </div>))}
     </div>
     <div style={{display:'flex',gap:8,marginBottom:14,flexWrap:'wrap'}}>
-      {tabs.map(t=><button key={t[0]} onClick={()=>setTab(t[0])} style={tabBtn(tab===t[0])}>{t[1]}</button>)}
+      <div style={{background:card,border:bd,borderRadius:12,padding:16,marginBottom:14}}>
+      <h3 style={{marginTop:0}}>AI Insights</h3>
+      {insights.map((x,i)=>(<div key={i} style={{padding:'8px 0',borderBottom:i<insights.length-1?bd:'none',fontSize:14}}>
+        <b style={{color:'#f59e0b'}}>{x[0]}: </b>{x[1]} <span style={{color:sub}}>— {x[2]}</span></div>))}
+    </div>
+    {tabs.map(t=><button key={t[0]} onClick={()=>setTab(t[0])} style={tabBtn(tab===t[0])}>{t[1]}</button>)}
     </div>
     {tab==='vehicles'&&<div style={{background:card,border:bd,borderRadius:12,padding:16}}>
       <h3 style={{marginTop:0}}>Add Vehicle</h3>
