@@ -69,7 +69,7 @@ export default function Register(){
         <button style={{width:'100%',padding:14,borderRadius:10,border:'none',background:'linear-gradient(90deg,#16a34a,#22c55e)',color:'#fff',fontWeight:800,fontSize:16,cursor:'pointer',boxSizing:'border-box'}}>VERIFY & CREATE ACCOUNT</button>
       </form>}
       {msg&&<p style={{color:msg.includes('success')||msg.includes('sent')?'#22c55e':'#f87171',marginTop:14,textAlign:'center',fontSize:14}}>{msg}</p>}
-      <div style={{textAlign:'center',marginTop:16,fontSize:14}}><a href="/" style={{color:sub,textDecoration:'none'}}>← Back to Login</a></div>
+      <div style={{textAlign:'center',marginTop:16,fontSize:14}}><a href="/login" style={{color:sub,textDecoration:'none'}}>← Back to Login</a></div>
     </div>
   </div>;
 }
