@@ -3,6 +3,7 @@ import axios from 'axios';
 import {useTheme} from '../context/ThemeContext';
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 export default function Register(){
+  const nav=useNavigate();
   const {dark,toggle}=useTheme();
   const [f,setF]=useState({fullName:'',email:'',password:'',role:'Client',contactNumber:'',dob:''});
   const [cpw,setCpw]=useState('');
@@ -28,7 +29,7 @@ export default function Register(){
   const handleOtp=(i,v)=>{if(!/^[0-9]?$/.test(v))return;const n=[...otp];n[i]=v;setOtp(n);if(v&&i<5)refs.current[i+1].focus();};
   const register=async(e)=>{e.preventDefault();try{
     const r=await axios.post(API+"/auth/register",{...f,otp:otp.join('')});
-    setMsg('Registered successfully! Your ID: '+r.data.uniqueId+' — save it for future reference');
+    nav('/success',{state:{title:'Registration Successful!',message:'Your FleetCommand account has been created.',uid:r.data.uniqueId,to:'/'}})
   }catch(e){setMsg(e.response?.data?.message||'Registration failed');}};
   return <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:bg,padding:20,fontFamily:'Segoe UI,system-ui,sans-serif'}}>
     <div style={{width:'100%',maxWidth:420,background:cardBg,border:cardBd,borderRadius:18,padding:'30px 28px',boxShadow:'0 24px 70px rgba(0,0,0,0.4)'}}>
