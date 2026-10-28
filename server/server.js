@@ -5,6 +5,7 @@ const express=require('express');const mongoose=require('mongoose');const cors=r
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const auditNotify = require('./utils/auditNotify');
+const {isStrongPassword} = require('./utils/passwordPolicy');
 const http=require('http');const {Server}=require('socket.io');
 const app=express();const server=http.createServer(app);
 const io=new Server(server,{cors:{origin:"*"}});
@@ -17,7 +18,7 @@ function strongPassword(req,res,next){
   if(/register|reset|signup|change|forgot/i.test(pth)){
     const b=req.body||{};
     const pw=(b.password!==undefined)?b.password:b.newPassword;
-    if(pw!==undefined && !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/.test(pw))
+    if(pw!==undefined && !isStrongPassword(pw))
       return res.status(400).json({msg:'Password must be 8+ characters with UPPER, lower and number'});
   }
   next();

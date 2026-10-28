@@ -1,5 +1,7 @@
 # FleetCommand — Enterprise AI-Powered Logistics Fleet Supply Chain Command Center
 
+![CI](https://github.com/matiur25580/Enterprise-AI-Powered-Logistics-Fleet-Supply-Chain-Command-Center/actions/workflows/ci.yml/badge.svg)
+
 A full-stack enterprise logistics platform connecting clients, fleet managers, warehouse managers and drivers in real time.
 
 **Live:** Frontend (Vercel) · Backend (Render) · MongoDB Atlas
