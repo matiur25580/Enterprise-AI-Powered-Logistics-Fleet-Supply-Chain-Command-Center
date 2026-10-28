@@ -173,7 +173,7 @@ export default function Admin(){
             <td style={td}>{t.from} to {t.to}</td>
             <td style={td}><select value={t.status} onChange={e=>tStatus(t._id,e.target.value)} style={{...inp,margin:0,width:'auto'}}>{T_STATUS.map(s=><option key={s} value={s}>{s}</option>)}</select></td>
             <td style={td}>{t.startDate?new Date(t.startDate).toLocaleDateString():'-'}</td>
-            <td style={td}><button onClick={async()=>{if(!window.confirm('Delete this trip?'))return;try{const r=await 【entity-axios¦canonical_name=Axios】.delete(API+'/trip/'+t._id);ok(r.data.message);load();}catch(e){ok(e.message);}}} style={{...btn,background:'#dc2626',color:'#fff',padding:'6px 12px',fontSize:12}}>Delete</button></td>
+            <td style={td}><button onClick={async()=>{if(!window.confirm('Delete this trip?'))return;try{const r=await axios.delete(API+'/trip/'+t._id);ok(r.data.message);load();}catch(e){ok(e.message);}}} style={{...btn,background:'#dc2626',color:'#fff',padding:'6px 12px',fontSize:12}}>Delete</button></td>
           </tr>))}
         </tbody></table></div>
       {fT.length===0&&<p style={{color:sub,textAlign:'center'}}>No trips yet.</p>}
