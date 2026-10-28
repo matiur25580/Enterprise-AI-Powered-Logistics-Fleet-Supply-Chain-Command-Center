@@ -31,7 +31,7 @@ export default function Register(){
   const register=async(e)=>{e.preventDefault();try{
     const r=await axios.post(API+"/auth/register",{...f,otp:otp.join('')});
     nav('/success',{state:{title:'Registration Successful!',message:'Your FleetCommand account has been created.',uid:r.data.uniqueId,to:'/'}})
-  }catch(e){setMsg(e.response?.data?.message||'Registration failed');}};
+  }catch(e){setMsg(e.response?.data?.message||e.response?.data?.msg||'Registration failed');}};
   return <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:bg,padding:20,fontFamily:'Segoe UI,system-ui,sans-serif'}}>
     <div style={{width:'100%',maxWidth:420,background:cardBg,border:cardBd,borderRadius:18,padding:'30px 28px',boxShadow:'0 24px 70px rgba(0,0,0,0.4)'}}>
       <div style={{display:'flex',justifyContent:'flex-end'}}><button onClick={toggle} style={{background:'transparent',border:'1px solid '+fBd,color:text,borderRadius:20,padding:'5px 12px',cursor:'pointer',fontSize:13}}>{dark?'☀️ Light':'🌙 Dark'}</button></div>
