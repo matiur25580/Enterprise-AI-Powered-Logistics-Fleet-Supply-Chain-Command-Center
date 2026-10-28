@@ -5,10 +5,10 @@ export default function Register(){
   const [otp,setOtp]=useState(['','','','','','']);const [step,setStep]=useState(1);
   const [timer,setTimer]=useState(300);const [msg,setMsg]=useState('');const refs=useRef([]);
   useEffect(()=>{if(step===2&&timer>0){const t=setTimeout(()=>setTimer(timer-1),1000);return()=>clearTimeout(t);}},[timer,step]);
-  const sendOtp=async()=>{try{await axios.post('import.meta.env.VITE_API_URL || 'http://localhost:5000/api'/auth/send-otp',{email:f.email});setStep(2);setTimer(300);setMsg('OTP sent to email');}catch(e){setMsg('OTP send failed');}};
+  const sendOtp=async()=>{try{await axios.post('import.meta.env.VITE_API_URL || 'import.meta.env.VITE_API_URL || 'http://localhost:5000/api''/auth/send-otp',{email:f.email});setStep(2);setTimer(300);setMsg('OTP sent to email');}catch(e){setMsg('OTP send failed');}};
   const handleOtp=(i,v)=>{if(!/^[0-9]?$/.test(v))return;const n=[...otp];n[i]=v;setOtp(n);if(v&&i<5)refs.current[i+1].focus();};
   const register=async(e)=>{e.preventDefault();try{
-    const r=await axios.post('import.meta.env.VITE_API_URL || 'http://localhost:5000/api'/auth/register',{...f,otp:otp.join('')});
+    const r=await axios.post('import.meta.env.VITE_API_URL || 'import.meta.env.VITE_API_URL || 'http://localhost:5000/api''/auth/register',{...f,otp:otp.join('')});
     setMsg('Registered successfully! Your ID: '+r.data.uniqueId+' - Save for future reference');
   }catch(e){setMsg(e.response?.data?.message||'Error');}};
   return <div style={{padding:40,maxWidth:450,margin:'auto'}}>
