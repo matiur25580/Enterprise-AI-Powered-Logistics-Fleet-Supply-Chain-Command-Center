@@ -71,4 +71,5 @@ r.post('/reset-password',async(req,res)=>{
   }catch(e){console.error('reset error:',e.message);res.status(500).json({message:e.message});}
 });
 
+r.get('/by-role/:role',async(req,res)=>{try{res.json(await User.find({role:req.params.role}).select('fullName email role'));}catch(e){res.status(500).json({message:e.message});}});
 module.exports=r;
