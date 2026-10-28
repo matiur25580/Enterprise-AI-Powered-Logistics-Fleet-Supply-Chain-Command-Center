@@ -57,7 +57,7 @@ export default function Register(){
         <label style={label}>Confirm Password</label>
         <input type="password" placeholder="Re-enter your password" style={input} onChange={e=>setCpw(e.target.value)} required/>
         <label style={label}>Account Role</label>
-        <select onChange={e=>setF({...f,role:e.target.value})} style={input}><option>Admin</option><option>FleetManager</option><option>WarehouseManager</option><option>Driver</option><option>Client</option></select>
+        <select value={f.role} onChange={e=>setF({...f,role:e.target.value})} style={input}><option>Admin</option><option>FleetManager</option><option>WarehouseManager</option><option>Driver</option><option>Client</option></select>
         <button disabled={sending} style={{width:'100%',padding:14,marginTop:16,borderRadius:10,border:'none',background:sending?'#64748b':'linear-gradient(90deg,#f59e0b,#f97316)',color:sending?'#e2e8f0':'#231303',fontWeight:800,fontSize:16,cursor:sending?'wait':'pointer',boxSizing:'border-box'}}>{sending?'SUBMITTING...':'SUBMIT →'}</button>
       </form>:
       <form onSubmit={register}>
