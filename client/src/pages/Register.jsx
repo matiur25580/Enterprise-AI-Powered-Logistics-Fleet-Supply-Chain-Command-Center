@@ -5,6 +5,7 @@ const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 export default function Register(){
   const {dark,toggle}=useTheme();
   const [f,setF]=useState({fullName:'',email:'',password:'',role:'Client',contactNumber:'',dob:''});
+  const [cpw,setCpw]=useState('');
   const [otp,setOtp]=useState(['','','','','','']);const [step,setStep]=useState(1);
   const [timer,setTimer]=useState(300);const [msg,setMsg]=useState('');
   const [sending,setSending]=useState(false);const refs=useRef([]);
@@ -18,6 +19,7 @@ export default function Register(){
   const sendOtp=async()=>{
     if(sending) return;
     if(!f.email){setMsg('Please enter email first');return;}
+    if(f.password!==cpw){setMsg('Password and Confirm Password do not match');return;}
     setSending(true);setMsg('Sending OTP, please wait...');
     try{await axios.post(API+"/auth/send-otp",{email:f.email},{timeout:45000});setStep(2);setTimer(300);setMsg('OTP sent to your email');}
     catch(e){setMsg('Error: '+(e.response?.data?.message||e.message||'OTP send failed'));}
@@ -50,9 +52,11 @@ export default function Register(){
         <input placeholder="e.g. 29081998" style={input} onChange={e=>setF({...f,dob:e.target.value})} required/>
         <label style={label}>Password</label>
         <input type="password" placeholder="Choose a strong password" style={input} onChange={e=>setF({...f,password:e.target.value})} required/>
+        <label style={label}>Confirm Password</label>
+        <input type="password" placeholder="Re-enter your password" style={input} onChange={e=>setCpw(e.target.value)} required/>
         <label style={label}>Account Role</label>
         <select onChange={e=>setF({...f,role:e.target.value})} style={input}><option>Admin</option><option>FleetManager</option><option>WarehouseManager</option><option>Driver</option><option>Client</option></select>
-        <button disabled={sending} style={{width:'100%',padding:14,marginTop:16,borderRadius:10,border:'none',background:sending?'#64748b':'linear-gradient(90deg,#f59e0b,#f97316)',color:sending?'#e2e8f0':'#231303',fontWeight:800,fontSize:16,cursor:sending?'wait':'pointer',boxSizing:'border-box'}}>{sending?'SENDING...':'SEND OTP →'}</button>
+        <button disabled={sending} style={{width:'100%',padding:14,marginTop:16,borderRadius:10,border:'none',background:sending?'#64748b':'linear-gradient(90deg,#f59e0b,#f97316)',color:sending?'#e2e8f0':'#231303',fontWeight:800,fontSize:16,cursor:sending?'wait':'pointer',boxSizing:'border-box'}}>{sending?'SUBMITTING...':'SUBMIT →'}</button>
       </form>:
       <form onSubmit={register}>
         <div style={{display:'flex',gap:8,justifyContent:'center',margin:'18px 0'}}>
