@@ -8,6 +8,7 @@ app.use('/api/auth',require('./routes/auth'));
 app.use('/api/fleet',require('./routes/fleet'));
 app.use('/api/trip',require('./routes/trip'));
 app.use('/api/warehouse',require('./routes/warehouse'));
+app.use('/api/booking',require('./routes/booking'));
 app.get('/api/health',(req,res)=>res.json({status:'Logistics API running'}));
 io.on('connection',(socket)=>{
   socket.on('update-location',(data)=>{io.emit('fleet-location',data);});
