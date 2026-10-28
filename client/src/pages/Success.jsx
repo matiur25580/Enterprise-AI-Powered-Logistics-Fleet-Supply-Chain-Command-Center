@@ -22,7 +22,7 @@ export default function Success(){
       {s.uid?(
       <div style={{background:dark?'rgba(245,158,11,.12)':'#fef3c7',border:'1px dashed #f59e0b',borderRadius:12,padding:12,marginBottom:18}}>
         <div style={{fontSize:12,color:sub}}>Your Unique ID</div>
-        <div style={{fontSize:22,fontWeight:800,letterSpacing:2,color:'#f59e0b'}}>{s.uid}</div>
+        <div style={{fontSize:22,fontWeight:800,letterSpacing:2,color:'#f59e0b',wordBreak:'break-all',overflowWrap:'anywhere',lineHeight:1.5}}>{s.uid}</div>
         <div style={{fontSize:12,color:sub,marginTop:4}}>Save it for future reference</div>
       </div>):null}
       <button onClick={()=>nav(s.to||'/')} style={{width:'100%',padding:14,border:'none',borderRadius:12,background:'#f59e0b',color:'#1a1005',fontWeight:800,fontSize:15,cursor:'pointer'}}>{s.btn||'GO TO LOGIN →'}</button>

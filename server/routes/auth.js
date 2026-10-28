@@ -27,7 +27,13 @@ r.post('/register',async(req,res)=>{
     const hash=await bcrypt.hash(password,10);
     const parts=fullName.trim().split(/\s+/);
     const first=parts[0]||'X', last=parts.length>1?parts[parts.length-1]:'X';
-    const uniqueId=(role[0]+first[0]+last[0]+dob).toUpperCase();
+    const nmParts=String(fullName||'').trim().split(/\s+/).filter(Boolean);
+    const fN=nmParts[0]||'X', lN=nmParts.length>1?nmParts[nmParts.length-1]:'X';
+    const dobDigits=String(dob||'').replace(/\D/g,'').slice(0,8).padEnd(8,'0');
+    let uniqueId=((role||'X')[0]+fN[0]+lN[0]+dobDigits).toUpperCase();
+    let _u=0,_c=uniqueId;
+    while(await User.findOne({uniqueId:_c})){_u++;_c=uniqueId+_u;}
+    uniqueId=_c;
     const user=await User.create({fullName,email,password:hash,role,contactNumber,dob,uniqueId});
     await Otp.deleteMany({email,role});
     res.json({message:'Registered successfully',success:true,uniqueId:user.uniqueId});
