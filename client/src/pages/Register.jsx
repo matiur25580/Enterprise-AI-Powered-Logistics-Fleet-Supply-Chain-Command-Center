@@ -14,7 +14,7 @@ export default function Register(){
     if(!f.email){setMsg('Please enter email first');return;}
     setSending(true);setMsg('Sending OTP, please wait...');
     try{
-      const r=await axios.post(API+"/auth/send-otp",{email:f.email});
+      const r=await axios.post(API+"/auth/send-otp",{email:f.email},{timeout:45000});
       console.log('OTP response:',r.data);
       setStep(2);setTimer(300);setMsg('OTP sent to email');
     }catch(e){
