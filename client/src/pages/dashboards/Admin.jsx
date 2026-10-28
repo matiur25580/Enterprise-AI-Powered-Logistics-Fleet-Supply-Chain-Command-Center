@@ -1,5 +1,5 @@
 import {useEffect,useState} from 'react';import io from 'socket.io-client';import axios from 'axios';import {useAuth} from '../../context/AuthContext';import {useTheme} from '../../context/ThemeContext';
-const socket=io('http://localhost:5000');
+const socket=io(import.meta.env.VITE_API_URL?.replace('/api','') || 'http://localhost:5000');
 export default function Admin(){
   const {logout}=useAuth();const {dark,toggle}=useTheme();const [live,setLive]=useState([]);const [stats,setStats]=useState({v:0,t:0,w:0});
   useEffect(()=>{socket.on('fleet-location',(d)=>{setLive(p=>[...p.slice(-9),d]);});

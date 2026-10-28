@@ -1,5 +1,5 @@
 import {useEffect,useState} from 'react';import io from 'socket.io-client';import {useAuth} from '../../context/AuthContext';import {useTheme} from '../../context/ThemeContext';
-const socket=io('http://localhost:5000');
+const socket=io(import.meta.env.VITE_API_URL?.replace('/api','') || 'http://localhost:5000');
 export default function Driver(){
   const {logout}=useAuth();const {dark,toggle}=useTheme();const [loc,setLoc]=useState({lat:22.5726,lng:88.3639});
   useEffect(()=>{const t=setInterval(()=>{const n={lat:loc.lat+0.001,lng:loc.lng+0.001,driver:'Driver-1'};setLoc(n);socket.emit('update-location',n);},3000);return()=>clearInterval(t);},[loc]);
