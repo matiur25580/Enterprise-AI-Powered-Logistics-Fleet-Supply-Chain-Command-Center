@@ -10,7 +10,8 @@ export default function FleetManager(){
   const {logout}=useAuth(); const {dark,toggle}=useTheme();
   const [tab,setTab]=useState('vehicles');
   const [vehicles,setVehicles]=useState([]); const [trips,setTrips]=useState([]);
-  const [drivers,setDrivers]=useState([]); const [msg,setMsg]=useState('');
+  const [drivers,setDrivers]=useState([]);
+  const [bookings,setBookings]=useState([]); const [bkId,setBkId]=useState(''); const [msg,setMsg]=useState('');
   const [vf,setVf]=useState({vehicleNumber:'',type:'Truck',capacity:'',driver:''});
   const [tf,setTf]=useState({vehicle:'',driver:'',from:'',to:'',startDate:''});
   const bg=dark?'#0a1128':'#eef2f9', card=dark?'#101d38':'#ffffff';
@@ -25,6 +26,7 @@ export default function FleetManager(){
     const g=async(u)=>{try{const r=await axios.get(API+u);return r.data||[];}catch(e){return [];}};
     setVehicles(await g('/fleet/all')); setTrips(await g('/trip/all'));
     setDrivers(await g('/auth/by-role/Driver'));
+    setBookings(await g('/booking/all'));
   };
   useEffect(()=>{load();},[]);
   const ok=(m)=>{setMsg(m);setTimeout(()=>setMsg(''),3500);};
@@ -37,6 +39,7 @@ export default function FleetManager(){
   }catch(e){ok(e.message);}};
   const addTrip=async(e)=>{e.preventDefault();try{
     const r=await axios.post(API+'/trip/create',tf);ok(r.data.message);
+    if(bkId){try{await axios.put(API+'/booking/status/'+bkId,{status:'Confirmed'});}catch(e){} setBkId('');}
     setTf({vehicle:'',driver:'',from:'',to:'',startDate:''});load();
   }catch(e){ok(e.response?.data?.message||e.message);}};
   const tStatus=async(id,status)=>{try{
@@ -61,6 +64,7 @@ export default function FleetManager(){
     <div style={{display:'flex',gap:8,marginBottom:14}}>
       <button onClick={()=>setTab('vehicles')} style={tabBtn(tab==='vehicles')}>Vehicles</button>
       <button onClick={()=>setTab('trips')} style={tabBtn(tab==='trips')}>Trips</button>
+      <button onClick={()=>setTab('bookings')} style={tabBtn(tab==='bookings')}>Bookings</button>
     </div>
     {tab==='vehicles'&&<div style={{background:card,border:bd,borderRadius:12,padding:16}}>
       <h3 style={{marginTop:0}}>Add Vehicle</h3>
@@ -85,8 +89,25 @@ export default function FleetManager(){
         </tbody></table></div>
       {vehicles.length===0&&<p style={{color:sub,textAlign:'center'}}>No vehicles yet.</p>}
     </div>}
+    {tab==='bookings'&&<div style={{background:card,border:bd,borderRadius:12,padding:16}}>
+      <h3 style={{marginTop:0}}>Client Bookings — Convert to Trip</h3>
+      <div style={{overflowX:'auto'}}><table style={{width:'100%',borderCollapse:'collapse'}}>
+        <thead><tr><th style={th}>Invoice</th><th style={th}>Client</th><th style={th}>Route</th><th style={th}>Goods</th><th style={th}>Status</th><th style={th}>Action</th></tr></thead>
+        <tbody>{bookings.map(b=>(
+          <tr key={b._id}>
+            <td style={td}><b>{b.invoiceNo}</b></td><td style={td}>{b.clientName||'-'}</td>
+            <td style={td}>{b.from} to {b.to}</td><td style={td}>{b.goods||'-'}</td>
+            <td style={td}>{b.status||'Pending'}</td>
+            <td style={td}>{(b.status||'Pending')==='Pending'||(b.status||'Pending')==='Confirmed'
+              ?<button onClick={()=>{setBkId(b._id);setTf({vehicle:'',driver:'',from:b.from||'',to:b.to||'',startDate:''});setTab('trips');window.scrollTo(0,0);}} style={{...btn,padding:'6px 12px',fontSize:12}}>Create Trip</button>
+              :<span style={{color:sub,fontSize:12}}>Converted</span>}</td>
+          </tr>))}
+        </tbody></table></div>
+      {bookings.length===0&&<p style={{color:sub,textAlign:'center'}}>No bookings yet.</p>}
+    </div>}
     {tab==='trips'&&<div style={{background:card,border:bd,borderRadius:12,padding:16}}>
       <h3 style={{marginTop:0}}>Create Trip</h3>
+      {bkId&&<p style={{color:'#f59e0b',fontSize:14}}>Converting booking to trip — on create, booking will be marked Confirmed.</p>}
       <form onSubmit={addTrip} style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))',gap:8,marginBottom:14}}>
         <select value={tf.vehicle} onChange={e=>setTf({...tf,vehicle:e.target.value})} style={inp} required>
           <option value="">Select Vehicle</option>

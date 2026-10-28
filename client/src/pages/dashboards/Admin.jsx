@@ -178,7 +178,7 @@ export default function Admin(){
     {tab==='bookings'&&<div style={{background:card,border:bd,borderRadius:12,padding:16}}>
       <h3 style={{marginTop:0}}>All Bookings ({bookings.length})</h3>
       <div style={{overflowX:'auto'}}><table style={{width:'100%',borderCollapse:'collapse'}}>
-        <thead><tr><th style={th}>Client</th><th style={th}>Route</th><th style={th}>Goods</th><th style={th}>Weight</th><th style={th}>Status</th><th style={th}>Date</th></tr></thead>
+        <thead><tr><th style={th}>Client</th><th style={th}>Route</th><th style={th}>Goods</th><th style={th}>Weight</th><th style={th}>Status</th><th style={th}>Date</th><th style={th}>Action</th></tr></thead>
         <tbody>{bookings.map(b=>(
           <tr key={b._id}>
             <td style={td}>{b.name||b.clientName||b.fullName||'-'}</td>
@@ -186,6 +186,7 @@ export default function Admin(){
             <td style={td}>{b.goods||'-'}</td><td style={td}>{b.weight||'-'}</td>
             <td style={td}><select value={b.status||'Pending'} onChange={async(e)=>{try{const r=await axios.put(API+'/booking/status/'+b._id,{status:e.target.value});ok(r.data.message);load();}catch(er){ok(er.message);}}} style={{...inp,margin:0,width:'auto'}}>{['Pending','Confirmed','OnGoing','Delivered','Cancelled'].map(s=><option key={s} value={s}>{s}</option>)}</select></td>
             <td style={td}>{b.createdAt?new Date(b.createdAt).toLocaleDateString():'-'}</td>
+            <td style={td}><button onClick={()=>{setTf({vehicle:'',driver:'',from:b.from||'',to:b.to||'',startDate:''});setTab('trips');window.scrollTo(0,0);}} style={{...btn,padding:'6px 12px',fontSize:12}}>Create Trip</button></td>
           </tr>))}
         </tbody></table></div>
       {bookings.length===0&&<p style={{color:sub,textAlign:'center'}}>No bookings yet.</p>}
