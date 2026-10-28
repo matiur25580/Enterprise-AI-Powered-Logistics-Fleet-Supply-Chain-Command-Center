@@ -1,3 +1,5 @@
+const dns=require('dns');
+try{dns.setDefaultResultOrder('ipv4first');}catch(e){}
 require('dotenv').config();
 const express=require('express');const mongoose=require('mongoose');const cors=require('cors');
 const http=require('http');const {Server}=require('socket.io');
