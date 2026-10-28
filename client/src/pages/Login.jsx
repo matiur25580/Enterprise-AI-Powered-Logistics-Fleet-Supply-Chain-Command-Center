@@ -22,6 +22,6 @@ export default function Login(){
       <button style={{width:'100%',padding:12,background:'#2563eb',color:'#fff',border:0}}>Login</button>
     </form>
     {msg&&<p style={{color:msg.includes('success')?'#22c55e':'red'}}>{msg}</p>}
-    <a href="/register">Register</a>
+    <a href="/register">Register</a><br/><a href="/forgot-password" style={{marginTop:8,display:"inline-block"}}>Forgot Password?</a>
   </div>;
 }

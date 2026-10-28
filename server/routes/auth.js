@@ -36,4 +36,27 @@ router.post('/login',async(req,res)=>{
   res.json({message:'Login successful',success:true,token,role:user.role,fullName:user.fullName});
   }catch(e){res.status(500).json({message:e.message});}
 });
+
+router.post('/forgot-password',async(req,res)=>{
+  try{const{email}=req.body;
+  const user=await User.findOne({email});
+  if(!user) return res.status(400).json({message:"This email doesn't exist"});
+  const otp=Math.floor(100000+Math.random()*900000).toString();
+  await Otp.deleteMany({email});
+  await Otp.create({email,otp,expiresAt:new Date(Date.now()+5*60*1000)});
+  await sendEmail(email,otp);
+  res.json({message:'OTP sent to email',success:true});
+  }catch(e){res.status(500).json({message:e.message});}
+});
+router.post('/reset-password',async(req,res)=>{
+  try{const{email,otp,newPassword}=req.body;
+  const f=await Otp.findOne({email,otp});
+  if(!f||f.expiresAt<new Date()) return res.status(400).json({message:'Invalid or expired OTP'});
+  const hash=await bcrypt.hash(newPassword,10);
+  await User.findOneAndUpdate({email},{password:hash});
+  await Otp.deleteMany({email});
+  res.json({message:'Password reset successfully',success:true});
+  }catch(e){res.status(500).json({message:e.message});}
+});
 module.exports=router;
+
