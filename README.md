@@ -155,5 +155,5 @@ Every push also runs the full CI pipeline (.github/workflows/ci.yml): backend Je
 
 ## 👤 Author
 
-**Rubel Ali** — MERN Full-Stack Developer
+**Matiur Rahaman** — Full-Stack Developer
 GitHub: [@matiur25580](https://github.com/matiur25580)
