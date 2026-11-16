@@ -17,7 +17,7 @@ function normalizeBookingInput(input) {
   const goods = optionalText(input.goods, 300);
   const weight = optionalText(input.weight, 80);
   if (!clientName || !from || !to || email === null || goods === null || weight === null) return null;
-  if (email && !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) return null;
+  if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return null;
   return { clientName, email, from, to, goods, weight };
 }
 
