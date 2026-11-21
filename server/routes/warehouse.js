@@ -23,7 +23,7 @@ router.post('/add', authorize('Admin', 'WarehouseManager'), async (req, res) => 
       return res.status(400).json({ message: 'Provide a valid name, location, and capacity values.' });
     }
 
-    let manager = req.user._id;
+    let manager = req.user.role === 'WarehouseManager' ? req.user._id : null;
     if (req.user.role === 'Admin' && req.body.manager) {
       if (!mongoose.isValidObjectId(req.body.manager)) {
         return res.status(400).json({ message: 'Invalid warehouse manager.' });
@@ -92,3 +92,4 @@ router.put('/stock/:id', authorize('Admin', 'WarehouseManager'), async (req, res
 });
 
 module.exports = router;
+module.exports.managerScope = managerScope;
