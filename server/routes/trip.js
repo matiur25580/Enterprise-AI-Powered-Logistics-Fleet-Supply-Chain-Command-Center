@@ -1,6 +1,6 @@
-const express=require('express');const Trip=require('../models/Trip');const r=express.Router();
-r.post('/create',async(req,res)=>{try{const t=await Trip.create(req.body);res.json({message:'Trip created successfully',success:true,t});}catch(e){res.status(500).json({message:e.message});}});
-r.get('/all',async(req,res)=>{const t=await Trip.find().populate('vehicle driver');res.json(t);});
-r.put('/status/:id',async(req,res)=>{await Trip.findByIdAndUpdate(req.params.id,{status:req.body.status});res.json({message:'Trip status updated successfully',success:true});});
-r.delete('/:id',async(req,res)=>{try{await Trip.findByIdAndDelete(req.params.id);res.json({message:'Trip deleted successfully',success:true});}catch(e){res.status(500).json({message:e.message});}});
+const express=require('express');const Trip=require('../models/Trip');const {authorize}=require('../middleware/auth');const r=express.Router();
+r.post('/create',authorize('Admin','FleetManager'),async(req,res)=>{try{const t=await Trip.create(req.body);res.json({message:'Trip created successfully',success:true,t});}catch(e){res.status(500).json({message:e.message});}});
+r.get('/all',authorize('Admin','FleetManager','Driver'),async(req,res)=>{const filter=req.user.role==='Driver'?{driver:req.user._id}:{};const t=await Trip.find(filter).populate('vehicle driver');res.json(t);});
+r.put('/status/:id',authorize('Admin','FleetManager','Driver'),async(req,res)=>{try{const t=await Trip.findById(req.params.id);if(!t)return res.status(404).json({message:'Trip not found'});if(req.user.role==='Driver'&&String(t.driver)!==String(req.user._id))return res.status(403).json({message:'You can only update your assigned trips'});if(!['Scheduled','OnGoing','Delivered','Cancelled'].includes(req.body.status))return res.status(400).json({message:'Invalid trip status'});t.status=req.body.status;await t.save();res.json({message:'Trip status updated successfully',success:true});}catch(e){res.status(500).json({message:e.message});}});
+r.delete('/:id',authorize('Admin','FleetManager'),async(req,res)=>{try{const t=await Trip.findByIdAndDelete(req.params.id);if(!t)return res.status(404).json({message:'Trip not found'});res.json({message:'Trip deleted successfully',success:true});}catch(e){res.status(500).json({message:e.message});}});
 module.exports=r;

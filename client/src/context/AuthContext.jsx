@@ -1,9 +1,24 @@
 import {createContext,useState,useContext} from 'react';
+import axios from 'axios';
 const C=createContext();
+function readStoredUser(){
+  try{return JSON.parse(localStorage.getItem('user')||'null');}catch(e){return null;}
+}
+const initialUser=readStoredUser();
+if(initialUser&&initialUser.token)axios.defaults.headers.common.Authorization='Bearer '+initialUser.token;
 export const AuthProvider=({children})=>{
-  const [user,setUser]=useState(JSON.parse(localStorage.getItem('user')||'null'));
-  const login=(d)=>{localStorage.setItem('user',JSON.stringify(d));setUser(d);};
-  const logout=()=>{localStorage.removeItem('user');setUser(null);window.location.href='/login';};
+  const [user,setUser]=useState(initialUser);
+  const login=(d)=>{
+    localStorage.setItem('user',JSON.stringify(d));
+    if(d&&d.token)axios.defaults.headers.common.Authorization='Bearer '+d.token;
+    setUser(d);
+  };
+  const logout=()=>{
+    localStorage.removeItem('user');
+    delete axios.defaults.headers.common.Authorization;
+    setUser(null);
+    window.location.href='/login';
+  };
   return <C.Provider value={{user,login,logout}}>{children}</C.Provider>;
 };
 export const useAuth=()=>useContext(C);

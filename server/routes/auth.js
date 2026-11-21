@@ -5,6 +5,7 @@ const User=require('../models/User');
 const Otp=require('../models/Otp');
 const sendEmail=require('../utils/sendEmail');
 const r=express.Router();
+const {authenticate,authorize}=require('../middleware/auth');
 const { isPublicRegistrationRole } = require('../utils/publicRegistration');
 
 r.post('/send-otp',async(req,res)=>{
@@ -51,7 +52,7 @@ r.post('/login',async(req,res)=>{
     const ok=await bcrypt.compare(password,user.password);
     if(!ok) return res.status(400).json({message:'Invalid credentials'});
     const token=jwt.sign({id:user._id,role:user.role},process.env.JWT_SECRET,{expiresIn:'7d'});
-    res.json({message:'Login successful',success:true,token,role:user.role,fullName:user.fullName,email:user.email});
+    res.json({message:'Login successful',success:true,token,role:user.role,fullName:user.fullName,email:user.email,_id:String(user._id)});
   }catch(e){console.error('login error:',e.message);res.status(500).json({message:e.message});}
 });
 
@@ -80,5 +81,5 @@ r.post('/reset-password',async(req,res)=>{
   }catch(e){console.error('reset error:',e.message);res.status(500).json({message:e.message});}
 });
 
-r.get('/by-role/:role',async(req,res)=>{try{res.json(await User.find({role:req.params.role}).select('fullName email role'));}catch(e){res.status(500).json({message:e.message});}});
+r.get('/by-role/:role',authenticate,authorize('Admin','FleetManager'),async(req,res)=>{try{res.json(await User.find({role:req.params.role}).select('fullName email role'));}catch(e){res.status(500).json({message:e.message});}});
 module.exports=r;

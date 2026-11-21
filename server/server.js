@@ -5,6 +5,10 @@ const express=require('express');const mongoose=require('mongoose');const cors=r
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const auditNotify = require('./utils/auditNotify');
+const { authenticate } = require('./middleware/auth');
+const jwt = require('jsonwebtoken');
+const User = require('./models/User');
+const Vehicle = require('./models/Vehicle');
 const {isStrongPassword} = require('./utils/passwordPolicy');
 const http=require('http');const {Server}=require('socket.io');
 const app=express();const server=http.createServer(app);
@@ -38,18 +42,44 @@ app.use(auditNotify);
 // ---- enterprise security: brute-force guard + password policy ----
 // ---- enterprise security: brute-force guard + password policy ----
 app.use('/api/auth',authLimiter, strongPassword, require('./routes/auth'));
-app.use('/api/fleet',require('./routes/fleet'));
-app.use('/api/trip',require('./routes/trip'));
-app.use('/api/warehouse',require('./routes/warehouse'));
-app.use('/api/booking',require('./routes/booking'));
-app.use('/api/audit', require('./routes/audit'));
-app.use('/api/notifications', require('./routes/notification'));
-app.use('/api/maintenance', require('./routes/maintenance'));
-app.use('/api/documents', require('./routes/documents'));
-app.use('/api/forecast', require('./routes/forecast'));
+app.use('/api/fleet', authenticate, require('./routes/fleet'));
+app.use('/api/trip', authenticate, require('./routes/trip'));
+app.use('/api/warehouse', authenticate, require('./routes/warehouse'));
+app.use('/api/booking', authenticate, require('./routes/booking'));
+app.use('/api/audit', authenticate, require('./routes/audit'));
+app.use('/api/notifications', authenticate, require('./routes/notification'));
+app.use('/api/maintenance', authenticate, require('./routes/maintenance'));
+app.use('/api/documents', authenticate, require('./routes/documents'));
+app.use('/api/forecast', authenticate, require('./routes/forecast'));
 app.get('/api/health',(req,res)=>res.json({status:'Logistics API running'}));
+io.use(async (socket, next) => {
+  try {
+    const token = socket.handshake.auth && socket.handshake.auth.token;
+    if (!token || !process.env.JWT_SECRET) return next(new Error('Authentication required'));
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(payload.id).select('_id role');
+    if (!user) return next(new Error('Invalid session'));
+    socket.user = user;
+    next();
+  } catch (error) {
+    next(new Error('Invalid or expired token'));
+  }
+});
 io.on('connection',(socket)=>{
-  socket.on('update-location',(data)=>{io.emit('fleet-location',data);});
+  socket.on('update-location',async(data)=>{
+    try {
+      if(socket.user.role!=='Driver'||!data||!Number.isFinite(Number(data.lat))||!Number.isFinite(Number(data.lng)))return;
+      const lat=Number(data.lat),lng=Number(data.lng);
+      if(lat < -90 || lat > 90 || lng < -180 || lng > 180)return;
+      const vehicle=await Vehicle.findOne({driver:socket.user._id});
+      if(!vehicle)return;
+      vehicle.lastLocation={lat,lng};
+      await vehicle.save();
+      io.emit('fleet-location',{vehicleId:String(vehicle._id),vehicleNumber:vehicle.vehicleNumber,lat,lng,driverId:String(socket.user._id)});
+    } catch(error) {
+      socket.emit('location-error',{message:'Unable to update location'});
+    }
+  });
 });
 const PORT=process.env.PORT||5000;
 mongoose.connect(process.env.MONGO_URI||'').then(()=>{console.log('MongoDB connected');server.listen(PORT,()=>console.log('Server on '+PORT));}).catch(e=>{console.log('DB error:'+e.message);server.listen(PORT,()=>console.log('Server on '+PORT));});
