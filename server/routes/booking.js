@@ -42,7 +42,7 @@ r.post('/create', authorize('Client'), async (req, res) => {
 });
 
 r.get('/all', async (req, res) => {
-  const filter = req.user.role === 'Client' ? { user: req.user._id, email: req.user.email }
+  const filter = req.user.role === 'Client' ? { $or: [{ user: req.user._id }, { email: req.user.email }] }
     : STAFF_READ.includes(req.user.role) ? {}
       : null;
   if (!filter) return res.status(403).json({ message: 'You cannot view bookings.' });
