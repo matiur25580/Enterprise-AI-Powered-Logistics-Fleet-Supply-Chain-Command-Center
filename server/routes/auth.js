@@ -5,7 +5,7 @@ const User=require('../models/User');
 const Otp=require('../models/Otp');
 const sendEmail=require('../utils/sendEmail');
 const r=express.Router();
-const isPublicRegistrationRole = (role) => role === 'Client';
+const { isPublicRegistrationRole } = require('../utils/publicRegistration');
 
 r.post('/send-otp',async(req,res)=>{
   try{
