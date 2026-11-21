@@ -7,12 +7,12 @@ import NotifBell from '../../components/NotifBell';
 import ForecastChart from '../../components/ForecastChart';
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const SOCKET_URL = API.replace('/api','');
-const socket=io(SOCKET_URL);
+const socket=io(SOCKET_URL,{autoConnect:false});
 const V_TYPES=['Truck','MiniTruck','Van','Container','Refrigerated'];
 const V_STATUS=['Active','Maintenance','OnTrip','Idle'];
 const T_STATUS=['Scheduled','OnGoing','Delivered','Cancelled'];
 export default function Admin(){
-  const {logout}=useAuth(); const {dark,toggle}=useTheme();
+  const {logout,user}=useAuth(); const {dark,toggle}=useTheme();
   const [tab,setTab]=useState('vehicles');
   const [vehicles,setVehicles]=useState([]); const [trips,setTrips]=useState([]);
   const [warehouses,setWarehouses]=useState([]); const [bookings,setBookings]=useState([]);
@@ -38,7 +38,7 @@ export default function Admin(){
     setDrivers(await g('/auth/by-role/Driver')); setManagers(await g('/auth/by-role/WarehouseManager'));
     const u={};for(const r of ['Admin','FleetManager','WarehouseManager','Driver','Client','Accountant']){u[r]=await g('/auth/by-role/'+r);}setUsers(u);
   };
-  useEffect(()=>{load();socket.on('fleet-location',(d)=>{setLive(p=>[...p.slice(-9),d]);});},[]);
+  useEffect(()=>{socket.auth={token:user?.token};socket.connect();load();const onLocation=(d)=>setLive(p=>[...p.slice(-9),d]);socket.on('fleet-location',onLocation);return()=>{socket.off('fleet-location',onLocation);socket.disconnect();};},[user?.token]);
   const ok=(m)=>{setMsg(m);setTimeout(()=>setMsg(''),3500);};
   const addVehicle=async(e)=>{e.preventDefault();try{
     const r=await axios.post(API+'/fleet/add',vf);ok(r.data.message);
