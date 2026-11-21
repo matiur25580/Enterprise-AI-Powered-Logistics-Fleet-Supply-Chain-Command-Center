@@ -5,11 +5,12 @@ const User=require('../models/User');
 const Otp=require('../models/Otp');
 const sendEmail=require('../utils/sendEmail');
 const r=express.Router();
+const isPublicRegistrationRole = (role) => role === 'Client';
 
 r.post('/send-otp',async(req,res)=>{
   try{
     const {email,role='Client'}=req.body;
-    if(role!=='Client') return res.status(403).json({message:'Public registration is available for Client accounts only. Contact an administrator for staff access.'});
+    if(!isPublicRegistrationRole(role)) return res.status(403).json({message:'Public registration is available for Client accounts only. Contact an administrator for staff access.'});
     const exists=await User.findOne({email,role});
     if(exists) return res.status(400).json({message:'This email already registered'});
     const otp=Math.floor(100000+Math.random()*900000).toString();
