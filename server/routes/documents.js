@@ -1,19 +1,52 @@
 const r = require('express').Router();
+const mongoose = require('mongoose');
 const Vehicle = require('../models/Vehicle');
-r.get('/expiring/list', async (req,res)=>{
-  const days = parseInt(req.query.days||'30');
-  const lim = new Date(Date.now()+days*864e5);
+const { authorize } = require('../middleware/auth');
+
+r.get('/expiring/list', authorize('Admin', 'FleetManager', 'Accountant'), async (req, res) => {
+  const parsed = Number.parseInt(req.query.days || '30', 10);
+  const days = Number.isFinite(parsed) ? Math.min(365, Math.max(1, parsed)) : 30;
+  const limit = new Date(Date.now() + days * 86400000);
   const now = new Date();
-  const vs = await Vehicle.find({}).limit(500);
-  const out = [];
-  for(const v of vs){
-    const docs = [['Insurance',v.insuranceExpiry],['Fitness',v.fitnessExpiry],['Permit',v.permitExpiry],['Pollution',v.pollutionExpiry]];
-    const exp = docs.filter(d=>d[1] && new Date(d[1])<=lim).map(d=>({name:d[0], expiry:d[1], overdue:new Date(d[1])<now}));
-    if(exp.length) out.push({_id:v._id, vehicleNo:v.vehicleNo||v.regNo||v.number||v.vehicleNumber||String(v._id).slice(-6), expiring:exp});
+  const vehicles = await Vehicle.find({}).select('vehicleNumber insuranceExpiry fitnessExpiry permitExpiry pollutionExpiry').limit(500);
+  const output = [];
+  for (const vehicle of vehicles) {
+    const documents = [
+      ['Insurance', vehicle.insuranceExpiry],
+      ['Fitness', vehicle.fitnessExpiry],
+      ['Permit', vehicle.permitExpiry],
+      ['Pollution', vehicle.pollutionExpiry]
+    ];
+    const expiring = documents
+      .filter((item) => item[1] && new Date(item[1]) <= limit)
+      .map((item) => ({ name: item[0], expiry: item[1], overdue: new Date(item[1]) < now }));
+    if (expiring.length) {
+      output.push({
+        _id: vehicle._id,
+        vehicleNo: vehicle.vehicleNumber,
+        expiring
+      });
+    }
   }
-  res.json(out);
+  return res.json(output);
 });
-r.put('/:id', async (req,res)=>{
-  res.json(await Vehicle.findByIdAndUpdate(req.params.id, req.body, {new:true}));
+
+r.put('/:id', authorize('Admin', 'FleetManager'), async (req, res) => {
+  if (!mongoose.isValidObjectId(req.params.id)) return res.status(400).json({ message: 'Invalid vehicle ID.' });
+  const allowed = ['insuranceExpiry', 'fitnessExpiry', 'permitExpiry', 'pollutionExpiry'];
+  const update = {};
+  for (const field of allowed) {
+    if (req.body[field] === undefined) continue;
+    const date = new Date(req.body[field]);
+    if (Number.isNaN(date.getTime()) || date.getTime() < 0 || date.getTime() > Date.now() + 20 * 365 * 86400000) {
+      return res.status(400).json({ message: 'Provide a valid document expiry date.' });
+    }
+    update[field] = date;
+  }
+  if (!Object.keys(update).length) return res.status(400).json({ message: 'No supported document expiry fields were supplied.' });
+  const vehicle = await Vehicle.findByIdAndUpdate(req.params.id, { $set: update }, { new: true, runValidators: true });
+  if (!vehicle) return res.status(404).json({ message: 'Vehicle not found.' });
+  return res.json({ success: true, vehicle });
 });
+
 module.exports = r;
