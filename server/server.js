@@ -45,11 +45,11 @@ app.use('/api/fleet', authenticate, require('./routes/fleet'));
 app.use('/api/trip', authenticate, require('./routes/trip'));
 app.use('/api/warehouse', authenticate, require('./routes/warehouse'));
 app.use('/api/booking', authenticate, require('./routes/booking'));
-app.use('/api/audit', require('./routes/audit'));
-app.use('/api/notifications', require('./routes/notification'));
-app.use('/api/maintenance', require('./routes/maintenance'));
-app.use('/api/documents', require('./routes/documents'));
-app.use('/api/forecast', require('./routes/forecast'));
+app.use('/api/audit', authenticate, require('./routes/audit'));
+app.use('/api/notifications', authenticate, require('./routes/notification'));
+app.use('/api/maintenance', authenticate, require('./routes/maintenance'));
+app.use('/api/documents', authenticate, require('./routes/documents'));
+app.use('/api/forecast', authenticate, require('./routes/forecast'));
 app.get('/api/health',(req,res)=>res.json({status:'Logistics API running'}));
 io.use(async (socket, next) => {
   try {
@@ -65,9 +65,15 @@ io.use(async (socket, next) => {
   }
 });
 io.on('connection',(socket)=>{
-  socket.on('update-location',(data)=>{
-    if (socket.user.role !== 'Driver') return;
-    io.emit('fleet-location',{...data,driverId:String(socket.user._id)});
+  socket.on('update-location',async(data)=>{
+    if(socket.user.role!=='Driver'||!data||!Number.isFinite(Number(data.lat))||!Number.isFinite(Number(data.lng)))return;
+    const lat=Number(data.lat),lng=Number(data.lng);
+    if(lat < -90 || lat > 90 || lng < -180 || lng > 180)return;
+    const vehicle=await Vehicle.findOne({driver:socket.user._id});
+    if(!vehicle)return;
+    vehicle.lastLocation={lat,lng};
+    await vehicle.save();
+    io.emit('fleet-location',{vehicleId:String(vehicle._id),vehicleNumber:vehicle.vehicleNumber,lat,lng,driverId:String(socket.user._id)});
   });
 });
 const PORT=process.env.PORT||5000;
