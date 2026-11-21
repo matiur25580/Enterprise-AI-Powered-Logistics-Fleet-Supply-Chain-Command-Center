@@ -6,6 +6,10 @@ const {normalizeBookingInput,isBookingStatus,isPaymentStatus,parseNonNegativeAmo
 r.post('/create',authorize('Client','Admin','FleetManager'),async(req,res)=>{try{
   const input=normalizeBookingInput(req.body);
   if(!input)return res.status(400).json({message:'Provide a valid client name, email, origin, and destination.'});
+  if(req.user.role==='Client'){
+    input.email=req.user.email;
+    input.clientName=req.user.fullName;
+  }
   const invoiceNo='INV'+Date.now();
   const b=await Booking.create({...input,invoiceNo});
   if(input.email){sendMail(input.email,'Booking Received - '+b.invoiceNo,
