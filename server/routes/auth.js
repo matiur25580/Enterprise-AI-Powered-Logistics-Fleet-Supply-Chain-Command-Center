@@ -7,6 +7,7 @@ const sendEmail=require('../utils/sendEmail');
 const r=express.Router();
 const {authenticate,authorize}=require('../middleware/auth');
 const { isPublicRegistrationRole } = require('../utils/publicRegistration');
+const { generateOtp, hashOtp, consumeOtp } = require('../utils/otpSecurity');
 
 r.post('/send-otp',async(req,res)=>{
   try{
@@ -14,9 +15,10 @@ r.post('/send-otp',async(req,res)=>{
     if(!isPublicRegistrationRole(role)) return res.status(403).json({message:'Public registration is available for Client accounts only. Contact an administrator for staff access.'});
     const exists=await User.findOne({email,role});
     if(exists) return res.status(400).json({message:'This email already registered'});
-    const otp=Math.floor(100000+Math.random()*900000).toString();
+    const otp=generateOtp();
+    const otpHash=await hashOtp(otp);
     await Otp.deleteMany({email,role});
-    await Otp.create({email,role,otp,expiresAt:new Date(Date.now()+5*60*1000)});
+    await Otp.create({email,role,otpHash,expiresAt:new Date(Date.now()+5*60*1000)});
     await sendEmail(email,otp);
     res.json({message:'OTP sent to email',success:true});
   }catch(e){console.error('send-otp error:',e.message);res.status(500).json({message:e.message});}
@@ -26,8 +28,8 @@ r.post('/register',async(req,res)=>{
   try{
     const {fullName,email,password,role='Client',contactNumber,dob,otp}=req.body;
     if(role!=='Client') return res.status(403).json({message:'Public registration is available for Client accounts only. Contact an administrator for staff access.'});
-    const f=await Otp.findOne({email,role,otp});
-    if(!f||f.expiresAt<new Date()) return res.status(400).json({message:'Invalid or expired OTP'});
+    const verified=await consumeOtp(Otp,{email,role,code:otp});
+    if(!verified) return res.status(400).json({message:'Invalid or expired OTP'});
     const hash=await bcrypt.hash(password,10);
     const parts=fullName.trim().split(/\s+/);
     const first=parts[0]||'X', last=parts.length>1?parts[parts.length-1]:'X';
@@ -61,9 +63,10 @@ r.post('/forgot-password',async(req,res)=>{
     const {email,role}=req.body;
     const user=await User.findOne({email,role});
     if(!user) return res.status(400).json({message:"This email doesn't exist"});
-    const otp=Math.floor(100000+Math.random()*900000).toString();
+    const otp=generateOtp();
+    const otpHash=await hashOtp(otp);
     await Otp.deleteMany({email,role});
-    await Otp.create({email,role,otp,expiresAt:new Date(Date.now()+5*60*1000)});
+    await Otp.create({email,role,otpHash,expiresAt:new Date(Date.now()+5*60*1000)});
     await sendEmail(email,otp);
     res.json({message:'OTP sent to email',success:true});
   }catch(e){console.error('forgot error:',e.message);res.status(500).json({message:e.message});}
@@ -72,11 +75,10 @@ r.post('/forgot-password',async(req,res)=>{
 r.post('/reset-password',async(req,res)=>{
   try{
     const {email,role,otp,newPassword}=req.body;
-    const f=await Otp.findOne({email,role,otp});
-    if(!f||f.expiresAt<new Date()) return res.status(400).json({message:'Invalid or expired OTP'});
+    const verified=await consumeOtp(Otp,{email,role,code:otp});
+    if(!verified) return res.status(400).json({message:'Invalid or expired OTP'});
     const hash=await bcrypt.hash(newPassword,10);
     await User.findOneAndUpdate({email,role},{password:hash});
-    await Otp.deleteMany({email,role});
     res.json({message:'Password reset successfully',success:true});
   }catch(e){console.error('reset error:',e.message);res.status(500).json({message:e.message});}
 });
