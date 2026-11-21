@@ -17,7 +17,7 @@ async function consumeOtp(Otp, { email, role, code }) {
     { email, role, expiresAt: { $gt: new Date() }, attempts: { $lt: MAX_OTP_ATTEMPTS } },
     { $inc: { attempts: 1 } },
     { new: true }
-  );
+  ).select('+otpHash');
   if (!challenge || !(await bcrypt.compare(code, challenge.otpHash))) return false;
   const consumed = await Otp.deleteOne({ _id: challenge._id, attempts: challenge.attempts });
   return consumed.deletedCount === 1;
