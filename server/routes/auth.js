@@ -52,7 +52,7 @@ r.post('/login',async(req,res)=>{
     const ok=await bcrypt.compare(password,user.password);
     if(!ok) return res.status(400).json({message:'Invalid credentials'});
     const token=jwt.sign({id:user._id,role:user.role},process.env.JWT_SECRET,{expiresIn:'7d'});
-    res.json({message:'Login successful',success:true,token,role:user.role,fullName:user.fullName,email:user.email});
+    res.json({message:'Login successful',success:true,token,role:user.role,fullName:user.fullName,email:user.email,_id:String(user._id)});
   }catch(e){console.error('login error:',e.message);res.status(500).json({message:e.message});}
 });
 
