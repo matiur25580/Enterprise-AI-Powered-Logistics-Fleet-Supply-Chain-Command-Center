@@ -1,5 +1,6 @@
 const express=require('express');const PDFDocument=require('pdfkit');const Booking=require('../models/Booking');const r=express.Router();
 const {authorize}=require('../middleware/auth');
+const Trip=require('../models/Trip');
 const {sendMail}=require('../utils/mailer');
 const {normalizeBookingInput,isBookingStatus,isPaymentStatus,parseNonNegativeAmount,escapeHtml}=require('../utils/bookingValidation');
 r.post('/create',authorize('Client','Admin','FleetManager'),async(req,res)=>{try{
@@ -18,7 +19,12 @@ r.get('/invoice/:id',authorize('Admin','FleetManager','Accountant','Client'),asy
   const doc=new PDFDocument();res.setHeader('Content-Type','application/pdf');res.setHeader('Content-Disposition',`attachment; filename=${b.invoiceNo}.pdf`);
   doc.pipe(res);doc.fontSize(20).text('Logistics Invoice',100,100);doc.fontSize(12).text(`Invoice No: ${b.invoiceNo}`,100,140);doc.text(`Client: ${b.clientName}`,100,160);doc.text(`From: ${b.from} To: ${b.to}`,100,180);doc.text(`Goods: ${b.goods} Weight: ${b.weight}`,100,200);doc.text(`Status: ${b.status}`,100,220);doc.text(`Date: ${new Date().toLocaleDateString('en-GB')}`,100,240);doc.end();
 });
-r.put('/status/:id',authorize('Admin','FleetManager'),async(req,res)=>{try{
+r.put('/status/:id',authorize('Admin','FleetManager','Driver'),async(req,res)=>{try{
+    if(req.user.role==='Driver'){
+      if(req.body.status!=='Delivered')return res.status(403).json({message:'Drivers may only mark assigned shipments as delivered'});
+      const assigned=await Trip.findOne({bookingId:req.params.id,driver:req.user._id,status:'Delivered'});
+      if(!assigned)return res.status(403).json({message:'Shipment is not assigned to you or trip is not delivered'});
+    }
     if(!isBookingStatus(req.body.status))return res.status(400).json({message:'Invalid booking status'});
     const b=await Booking.findByIdAndUpdate(req.params.id,{status:req.body.status},{new:true,runValidators:true});
     if(!b)return res.status(404).json({message:'Booking not found'});
