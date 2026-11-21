@@ -5,10 +5,12 @@ const User=require('../models/User');
 const Otp=require('../models/Otp');
 const sendEmail=require('../utils/sendEmail');
 const r=express.Router();
+const { isPublicRegistrationRole } = require('../utils/publicRegistration');
 
 r.post('/send-otp',async(req,res)=>{
   try{
-    const {email,role}=req.body;
+    const {email,role='Client'}=req.body;
+    if(!isPublicRegistrationRole(role)) return res.status(403).json({message:'Public registration is available for Client accounts only. Contact an administrator for staff access.'});
     const exists=await User.findOne({email,role});
     if(exists) return res.status(400).json({message:'This email already registered'});
     const otp=Math.floor(100000+Math.random()*900000).toString();
@@ -21,7 +23,8 @@ r.post('/send-otp',async(req,res)=>{
 
 r.post('/register',async(req,res)=>{
   try{
-    const {fullName,email,password,role,contactNumber,dob,otp}=req.body;
+    const {fullName,email,password,role='Client',contactNumber,dob,otp}=req.body;
+    if(role!=='Client') return res.status(403).json({message:'Public registration is available for Client accounts only. Contact an administrator for staff access.'});
     const f=await Otp.findOne({email,role,otp});
     if(!f||f.expiresAt<new Date()) return res.status(400).json({message:'Invalid or expired OTP'});
     const hash=await bcrypt.hash(password,10);
