@@ -5,6 +5,7 @@ const User=require('../models/User');
 const Otp=require('../models/Otp');
 const sendEmail=require('../utils/sendEmail');
 const r=express.Router();
+const {authenticate,authorize}=require('../middleware/auth');
 const { isPublicRegistrationRole } = require('../utils/publicRegistration');
 
 r.post('/send-otp',async(req,res)=>{
@@ -80,5 +81,5 @@ r.post('/reset-password',async(req,res)=>{
   }catch(e){console.error('reset error:',e.message);res.status(500).json({message:e.message});}
 });
 
-r.get('/by-role/:role',async(req,res)=>{try{res.json(await User.find({role:req.params.role}).select('fullName email role'));}catch(e){res.status(500).json({message:e.message});}});
+r.get('/by-role/:role',authenticate,authorize('Admin','FleetManager'),async(req,res)=>{try{res.json(await User.find({role:req.params.role}).select('fullName email role'));}catch(e){res.status(500).json({message:e.message});}});
 module.exports=r;
