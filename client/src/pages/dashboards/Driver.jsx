@@ -5,7 +5,7 @@ import {useAuth} from '../../context/AuthContext';
 import {useTheme} from '../../context/ThemeContext';
 const API = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 const SOCKET_URL = API.replace('/api','');
-const socket=io(SOCKET_URL);
+const socket=io(SOCKET_URL,{autoConnect:false});
 const T_STATUS=['Scheduled','OnGoing','Delivered','Cancelled'];
 export default function Driver(){
   const {user,logout}=useAuth(); const {dark,toggle}=useTheme();
@@ -30,13 +30,14 @@ export default function Driver(){
     }catch(e){console.error(e);}
   };
   useEffect(()=>{load();return()=>{if(timer.current)clearInterval(timer.current);};},[]);
+  useEffect(()=>{socket.auth={token:user?.token};socket.connect();return()=>socket.disconnect();},[user?.token]);
   const toggleShare=()=>{
     if(sharing){clearInterval(timer.current);timer.current=null;setSharing(false);}
     else{
       setSharing(true);
       timer.current=setInterval(()=>{
         setLoc(p=>{
-          const n={lat:p.lat+0.0008,lng:p.lng+0.0008,driver:user.fullName||'Driver'};
+          const n={lat:p.lat+0.0008,lng:p.lng+0.0008,vehicleId:myVehicle?._id};
           socket.emit('update-location',n);return n;
         });
       },3000);
