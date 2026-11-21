@@ -157,3 +157,80 @@ Every push also runs the full CI pipeline (.github/workflows/ci.yml): backend Je
 
 **Matiur Rahaman** — Full-Stack Developer
 GitHub: [@matiur25580](https://github.com/matiur25580)
+
+
+## Dashboard Gallery
+
+Explore 12 illustrative logistics workspaces for fleet operations, dispatch, drivers, vehicle maintenance, warehouses, shipments, routing, fuel costs, procurement, safety, customer delivery and supply-chain performance. All values are sample data; these concepts are not live fleet screenshots or actual shipment records.
+
+### 01. Fleet Operations Overview
+
+Fleet availability, vehicle health, active trips and utilization.
+
+![Fleet Operations Overview dashboard preview](docs/readme-dashboard-gallery/dashboard-01.svg)
+
+### 02. Trip Dispatch & Tracking
+
+Dispatch queues, trip progress, route status and delivery milestones.
+
+![Trip Dispatch & Tracking dashboard preview](docs/readme-dashboard-gallery/dashboard-02.svg)
+
+### 03. Driver Management
+
+Driver roster, assignment readiness, credentials and duty status.
+
+![Driver Management dashboard preview](docs/readme-dashboard-gallery/dashboard-03.svg)
+
+### 04. Vehicle Health & Maintenance
+
+Preventive maintenance, inspections, repair backlog and vehicle readiness.
+
+![Vehicle Health & Maintenance dashboard preview](docs/readme-dashboard-gallery/dashboard-04.svg)
+
+### 05. Warehouse Operations
+
+Warehouse capacity, inbound/outbound movement, inventory and fulfilment.
+
+![Warehouse Operations dashboard preview](docs/readme-dashboard-gallery/dashboard-05.svg)
+
+### 06. Shipment & Order Visibility
+
+Shipment stages, order exceptions, proof of delivery and delivery performance.
+
+![Shipment & Order Visibility dashboard preview](docs/readme-dashboard-gallery/dashboard-06.svg)
+
+### 07. Route & Network Analytics
+
+Route efficiency, distance trends, congestion exposure and network coverage.
+
+![Route & Network Analytics dashboard preview](docs/readme-dashboard-gallery/dashboard-07.svg)
+
+### 08. Fuel & Expense Management
+
+Fuel usage, trip costs, expense review and fleet operating budgets.
+
+![Fuel & Expense Management dashboard preview](docs/readme-dashboard-gallery/dashboard-08.svg)
+
+### 09. Supplier & Procurement
+
+Supplier performance, purchase requests, replenishment and vendor status.
+
+![Supplier & Procurement dashboard preview](docs/readme-dashboard-gallery/dashboard-09.svg)
+
+### 10. Safety & Compliance
+
+Document expiries, safety incidents, compliance checks and corrective actions.
+
+![Safety & Compliance dashboard preview](docs/readme-dashboard-gallery/dashboard-10.svg)
+
+### 11. Customer Delivery Experience
+
+Delivery commitments, customer feedback, failed attempts and service quality.
+
+![Customer Delivery Experience dashboard preview](docs/readme-dashboard-gallery/dashboard-11.svg)
+
+### 12. Supply Chain Performance
+
+End-to-end fulfilment, warehouse throughput, cost and service-level trends.
+
+![Supply Chain Performance dashboard preview](docs/readme-dashboard-gallery/dashboard-12.svg)
