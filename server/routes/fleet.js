@@ -33,14 +33,16 @@ r.post('/add', authorize('Admin', 'FleetManager'), async (req, res) => {
   }
 });
 
-r.get('/all', async (req, res) => {
+const listVehicles = async (req, res) => {
   if (!READ_ROLES.includes(req.user.role) && req.user.role !== 'Driver') {
     return res.status(403).json({ message: 'You cannot view fleet vehicles.' });
   }
   const filter = req.user.role === 'Driver' ? { driver: req.user._id } : {};
   const vehicles = await Vehicle.find(filter).populate('driver', 'fullName').sort({ createdAt: -1 }).limit(500);
   return res.json(vehicles);
-});
+};
+r.get('/all', listVehicles);
+r.get('/', listVehicles);
 
 r.put('/status/:id', authorize('Admin', 'FleetManager'), async (req, res) => {
   if (!STATUSES.includes(req.body.status)) return res.status(400).json({ message: 'Invalid vehicle status.' });
