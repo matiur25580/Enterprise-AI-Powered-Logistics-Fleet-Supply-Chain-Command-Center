@@ -8,6 +8,7 @@ const auditNotify = require('./utils/auditNotify');
 const { authenticate } = require('./middleware/auth');
 const jwt = require('jsonwebtoken');
 const User = require('./models/User');
+const Vehicle = require('./models/Vehicle');
 const {isStrongPassword} = require('./utils/passwordPolicy');
 const http=require('http');const {Server}=require('socket.io');
 const app=express();const server=http.createServer(app);
@@ -66,14 +67,18 @@ io.use(async (socket, next) => {
 });
 io.on('connection',(socket)=>{
   socket.on('update-location',async(data)=>{
-    if(socket.user.role!=='Driver'||!data||!Number.isFinite(Number(data.lat))||!Number.isFinite(Number(data.lng)))return;
-    const lat=Number(data.lat),lng=Number(data.lng);
-    if(lat < -90 || lat > 90 || lng < -180 || lng > 180)return;
-    const vehicle=await Vehicle.findOne({driver:socket.user._id});
-    if(!vehicle)return;
-    vehicle.lastLocation={lat,lng};
-    await vehicle.save();
-    io.emit('fleet-location',{vehicleId:String(vehicle._id),vehicleNumber:vehicle.vehicleNumber,lat,lng,driverId:String(socket.user._id)});
+    try {
+      if(socket.user.role!=='Driver'||!data||!Number.isFinite(Number(data.lat))||!Number.isFinite(Number(data.lng)))return;
+      const lat=Number(data.lat),lng=Number(data.lng);
+      if(lat < -90 || lat > 90 || lng < -180 || lng > 180)return;
+      const vehicle=await Vehicle.findOne({driver:socket.user._id});
+      if(!vehicle)return;
+      vehicle.lastLocation={lat,lng};
+      await vehicle.save();
+      io.emit('fleet-location',{vehicleId:String(vehicle._id),vehicleNumber:vehicle.vehicleNumber,lat,lng,driverId:String(socket.user._id)});
+    } catch(error) {
+      socket.emit('location-error',{message:'Unable to update location'});
+    }
   });
 });
 const PORT=process.env.PORT||5000;
