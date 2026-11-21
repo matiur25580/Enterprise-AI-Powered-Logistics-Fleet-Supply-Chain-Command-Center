@@ -3,7 +3,7 @@ const { generateOtp, hashOtp, consumeOtp, MAX_OTP_ATTEMPTS } = require('../utils
 
 describe('OTP security', () => {
   test('generates six numeric digits using a cryptographic source', () => {
-    for (let i = 0; i < 25; i++) expect(generateOtp()).toMatch(/^\\d{6}$/);
+    for (let i = 0; i < 25; i++) expect(generateOtp()).toMatch(/^\d{6}$/);
   });
 
   test('stores a bcrypt hash rather than the original OTP', async () => {
