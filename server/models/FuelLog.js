@@ -6,6 +6,7 @@ const FuelLogSchema = new mongoose.Schema({
   liters: Number,
   cost: Number,
   odometer: Number,
-  note: String
+  note: String,
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
 }, {timestamps:true});
 module.exports = mongoose.model('FuelLog', FuelLogSchema);
