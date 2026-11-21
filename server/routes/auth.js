@@ -8,6 +8,7 @@ const r=express.Router();
 const {authenticate,authorize}=require('../middleware/auth');
 const { isPublicRegistrationRole } = require('../utils/publicRegistration');
 const { generateOtp, hashOtp, consumeOtp } = require('../utils/otpSecurity');
+const { passwordRecoveryResponse } = require('../utils/passwordRecoveryResponse');
 
 r.post('/send-otp',async(req,res)=>{
   try{
@@ -62,14 +63,16 @@ r.post('/forgot-password',async(req,res)=>{
   try{
     const {email,role}=req.body;
     const user=await User.findOne({email,role});
-    if(!user) return res.status(400).json({message:"This email doesn't exist"});
-    const otp=generateOtp();
-    const otpHash=await hashOtp(otp);
-    await Otp.deleteMany({email,role});
-    await Otp.create({email,role,otpHash,expiresAt:new Date(Date.now()+5*60*1000)});
-    await sendEmail(email,otp);
-    res.json({message:'OTP sent to email',success:true});
-  }catch(e){console.error('forgot error:',e.message);res.status(500).json({message:e.message});}
+    if(user){
+      const otp=generateOtp();
+      const otpHash=await hashOtp(otp);
+      await Otp.deleteMany({email,role});
+      await Otp.create({email,role,otpHash,expiresAt:new Date(Date.now()+5*60*1000)});
+      await sendEmail(email,otp);
+    }
+    // Keep status and response body identical for known and unknown accounts.
+    res.json(passwordRecoveryResponse());
+  }catch(e){console.error('forgot error:',e.message);res.status(500).json({message:'Unable to process password recovery right now'});}
 });
 
 r.post('/reset-password',async(req,res)=>{
