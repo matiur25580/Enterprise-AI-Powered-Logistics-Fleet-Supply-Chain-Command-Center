@@ -9,6 +9,7 @@ const { authenticate } = require('./middleware/auth');
 const jwt = require('jsonwebtoken');
 const User = require('./models/User');
 const Vehicle = require('./models/Vehicle');
+const { canViewFleetLocation } = require('./utils/fleetLocationPolicy');
 const {isStrongPassword} = require('./utils/passwordPolicy');
 const http=require('http');const {Server}=require('socket.io');
 const app=express();const server=http.createServer(app);
@@ -66,6 +67,8 @@ io.use(async (socket, next) => {
   }
 });
 io.on('connection',(socket)=>{
+  // Precise driver locations are restricted to fleet operations staff.
+  if (canViewFleetLocation(socket.user.role)) socket.join('fleet-operations');
   socket.on('update-location',async(data)=>{
     try {
       if(socket.user.role!=='Driver'||!data||!Number.isFinite(Number(data.lat))||!Number.isFinite(Number(data.lng)))return;
@@ -75,7 +78,7 @@ io.on('connection',(socket)=>{
       if(!vehicle)return;
       vehicle.lastLocation={lat,lng};
       await vehicle.save();
-      io.emit('fleet-location',{vehicleId:String(vehicle._id),vehicleNumber:vehicle.vehicleNumber,lat,lng,driverId:String(socket.user._id)});
+      io.to('fleet-operations').emit('fleet-location',{vehicleId:String(vehicle._id),vehicleNumber:vehicle.vehicleNumber,lat,lng,driverId:String(socket.user._id)});
     } catch(error) {
       socket.emit('location-error',{message:'Unable to update location'});
     }
