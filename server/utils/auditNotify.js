@@ -1,6 +1,7 @@
 const AuditLog = require('../models/AuditLog');
 const Notification = require('../models/Notification');
 const User = require('../models/User');
+const { getAuthenticatedAuditActor } = require('./auditActorPolicy');
 const SKIP = ['/api/auth/login','/api/auth/register','/api/auth/send-otp','/api/auth/verify','/api/auth/forgot','/api/auth/reset','/api/notifications','/api/audit'];
 async function notifyRoles(roles, title, message, excludeEmail){
   try{
@@ -16,10 +17,8 @@ module.exports = function auditNotify(req,res,next){
   const origJson = res.json.bind(res);
   res.json = function(body){
     if(res.statusCode < 400){
-      // Authentication middleware runs before route handlers and populates req.user.
-      // Never trust actor identity or role supplied by a client-controlled body, query, or JWT decode.
-      const actorEmail = req.user && req.user.email ? req.user.email : 'system';
-      const role = req.user && req.user.role ? req.user.role : '-';
+      // req.user is loaded from the database by authentication middleware.
+      const {actor:actorEmail,role} = getAuthenticatedAuditActor(req.user);
       const safe = Object.assign({}, req.body||{});
       delete safe.password; delete safe.newPassword; delete safe.otp;
       AuditLog.create({actor:actorEmail, role, action:req.method+' '+fullPath,
