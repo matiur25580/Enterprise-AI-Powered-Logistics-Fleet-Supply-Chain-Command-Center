@@ -1,7 +1,6 @@
-const express=require('express');const Trip=require('../models/Trip');const {authorize}=require('../middleware/auth');const {canTransitionTripStatus}=require('../utils/tripPolicy');const r=express.Router();
+const express=require('express');const Trip=require('../models/Trip');const {authorize}=require('../middleware/auth');const {canTransitionTripStatus}=require('../utils/tripPolicy');const {buildTripCreatePayload}=require('../utils/tripCreatePolicy');const r=express.Router();
 r.post('/create',authorize('Admin','FleetManager'),async(req,res)=>{try{
-  const {bookingId,vehicle,driver,from,to,startDate,endDate}=req.body||{};
-  const t=await Trip.create({bookingId,vehicle,driver,from,to,startDate,endDate,status:'Scheduled'});
+  const t=await Trip.create(buildTripCreatePayload(req.body||{}));
   res.status(201).json({message:'Trip created successfully',success:true,t});
 }catch(e){res.status(400).json({message:'Invalid trip details'});}});
 r.get('/all',authorize('Admin','FleetManager','Driver'),async(req,res)=>{const filter=req.user.role==='Driver'?{driver:req.user._id}:{};const t=await Trip.find(filter).populate('vehicle driver');res.json(t);});
