@@ -1,16 +1,8 @@
 const AuditLog = require('../models/AuditLog');
 const Notification = require('../models/Notification');
 const User = require('../models/User');
+const { getAuthenticatedAuditActor } = require('./auditActorPolicy');
 const SKIP = ['/api/auth/login','/api/auth/register','/api/auth/send-otp','/api/auth/verify','/api/auth/forgot','/api/auth/reset','/api/notifications','/api/audit'];
-function decodeRole(req){
-  try{
-    const h = req.headers.authorization || '';
-    const t = h.replace('Bearer ','');
-    if(!t || t.split('.').length !== 3) return null;
-    const pl = JSON.parse(Buffer.from(t.split('.')[1],'base64').toString());
-    return pl.role || pl.accountRole || null;
-  }catch(e){ return null; }
-}
 async function notifyRoles(roles, title, message, excludeEmail){
   try{
     const users = await User.find({role:{$in:roles}}).select('email');
@@ -22,11 +14,11 @@ module.exports = function auditNotify(req,res,next){
   if(!['POST','PUT','DELETE','PATCH'].includes(req.method)) return next();
   const fullPath = (req.baseUrl||'') + (req.path||'');
   if(SKIP.some(p=>fullPath.startsWith(p))) return next();
-  const actorEmail = (req.body && req.body.email) || req.query.email || 'unknown';
-  const role = decodeRole(req) || (req.body && req.body.role) || '-';
   const origJson = res.json.bind(res);
   res.json = function(body){
     if(res.statusCode < 400){
+      // req.user is loaded from the database by authentication middleware.
+      const {actor:actorEmail,role} = getAuthenticatedAuditActor(req.user);
       const safe = Object.assign({}, req.body||{});
       delete safe.password; delete safe.newPassword; delete safe.otp;
       AuditLog.create({actor:actorEmail, role, action:req.method+' '+fullPath,
