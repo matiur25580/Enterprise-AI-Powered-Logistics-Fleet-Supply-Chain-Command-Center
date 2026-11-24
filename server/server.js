@@ -12,6 +12,7 @@ const Vehicle = require('./models/Vehicle');
 const { canViewFleetLocation } = require('./utils/fleetLocationPolicy');
 const {isStrongPassword} = require('./utils/passwordPolicy');
 const http=require('http');const {Server}=require('socket.io');
+// HTTP API and Socket.IO share one server so live fleet updates use the same deployment endpoint.
 const app=express();const server=http.createServer(app);
 const io=new Server(server,{cors:{origin:"*"}});
 app.use(cors());app.use(express.json())
