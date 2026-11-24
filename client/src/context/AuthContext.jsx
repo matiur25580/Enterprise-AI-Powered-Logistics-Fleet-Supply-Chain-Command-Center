@@ -1,6 +1,7 @@
 import {createContext,useState,useContext} from 'react';
 import axios from 'axios';
 const C=createContext();
+// Restore the previous browser session once so the app can initialize its signed-in state.
 function readStoredUser(){
   try{return JSON.parse(localStorage.getItem('user')||'null');}catch(e){return null;}
 }
