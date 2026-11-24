@@ -1,4 +1,5 @@
 const mongoose=require('mongoose');
+// A trip links a booking, assigned vehicle and driver with its route, schedule, and proof of delivery.
 const t=new mongoose.Schema({
   bookingId:String, vehicle:{type:mongoose.Schema.Types.ObjectId,ref:'Vehicle'},
   driver:{type:mongoose.Schema.Types.ObjectId,ref:'User'},
