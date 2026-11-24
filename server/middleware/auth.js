@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
+// Resolves the authenticated user from the Bearer token before protected logistics routes run.
 async function authenticate(req, res, next) {
   const header = req.headers.authorization || '';
   const match = header.match(/^Bearer\s+(.+)$/i);
